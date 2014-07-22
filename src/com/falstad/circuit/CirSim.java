@@ -2,29 +2,31 @@ package com.falstad.circuit;
 
 // CirSim.java (c) 2010 by Paul Falstad
 // For information about the theory behind this, see Electronic Circuit & System Simulation Methods by Pillage
-import java.applet.Applet;
+import com.falstad.circuit.EditDialog.Editable;
+import com.falstad.circuit.elements.CapacitorElm;
+import com.falstad.circuit.elements.CurrentElm;
+import com.falstad.circuit.elements.GroundElm;
+import com.falstad.circuit.elements.InductorElm;
+import com.falstad.circuit.elements.RailElm;
+import com.falstad.circuit.elements.ResistorElm;
+import com.falstad.circuit.elements.SwitchElm;
+import com.falstad.circuit.elements.VoltageElm;
+import com.falstad.circuit.elements.WireElm;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilterInputStream;
-import java.io.InputStream;
 import java.lang.Math;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import javax.swing.JFrame;
 
-public class CirSim extends JFrame
+public class CirSim extends Frame
         implements ComponentListener, ActionListener, AdjustmentListener,
         MouseMotionListener, MouseListener, ItemListener, KeyListener {
 
@@ -48,16 +50,16 @@ public class CirSim extends JFrame
     MenuItem exportItem, exportLinkItem, importItem, exitItem, undoItem, redoItem,
             cutItem, copyItem, pasteItem, selectAllItem, optionsItem;
     Menu optionsMenu;
-    Checkbox stoppedCheck;
-    CheckboxMenuItem dotsCheckItem;
-    CheckboxMenuItem voltsCheckItem;
-    CheckboxMenuItem powerCheckItem;
-    CheckboxMenuItem smallGridCheckItem;
-    CheckboxMenuItem showValuesCheckItem;
-    CheckboxMenuItem conductanceCheckItem;
-    CheckboxMenuItem euroResistorCheckItem;
-    CheckboxMenuItem printableCheckItem;
-    CheckboxMenuItem conventionCheckItem;
+    public Checkbox stoppedCheck;
+    public CheckboxMenuItem dotsCheckItem;
+    public CheckboxMenuItem voltsCheckItem;
+    public CheckboxMenuItem powerCheckItem;
+    public CheckboxMenuItem smallGridCheckItem;
+    public CheckboxMenuItem showValuesCheckItem;
+    public CheckboxMenuItem conductanceCheckItem;
+    public CheckboxMenuItem euroResistorCheckItem;
+    public CheckboxMenuItem printableCheckItem;
+    public CheckboxMenuItem conventionCheckItem;
     Scrollbar speedBar;
     Scrollbar currentBar;
     Label powerLabel;
@@ -146,14 +148,14 @@ public class CirSim extends JFrame
     static EditDialog editDialog;
     static ImportExportDialog impDialog, expDialog;
     Class dumpTypes[], shortcuts[];
-    static String muString = "u";
-    static String ohmString = "ohm";
+    public static String muString = "u";
+    public static String ohmString = "ohm";
     String clipboard;
     Rectangle circuitArea;
     int circuitBottom;
     Vector<String> undoStack, redoStack;
 
-    int getrand(int x) {
+    public int getrand(int x) {
         int q = random.nextInt();
         if (q < 0) {
             q = -q;
@@ -163,7 +165,7 @@ public class CirSim extends JFrame
     CircuitCanvas cv;
     Circuit applet;
 
-    public CirSim(Circuit a) {
+    CirSim(Circuit a) {
         super("Circuit Simulator v1.6h");
         applet = a;
         useFrame = false;
@@ -410,7 +412,7 @@ public class CirSim extends JFrame
         activeMenu.add(getClassCheckItem("Add Triode", "TriodeElm"));
         //activeMenu.add(getClassCheckItem("Add Diac", "DiacElm"));
         //activeMenu.add(getClassCheckItem("Add Triac", "TriacElm"));
-        //activeMenu.add(getClassCheckItem("Add Photoresistor", "PhotoResistorElm"));
+//        activeMenu.add(getClassCheckItem("Add Photoresistor", "PhotoResistorElm"));
         //activeMenu.add(getClassCheckItem("Add Thermistor", "ThermistorElm"));
         activeMenu.add(getClassCheckItem("Add CCII+", "CC2Elm"));
         activeMenu.add(getClassCheckItem("Add CCII-", "CC2NegElm"));
@@ -580,6 +582,22 @@ public class CirSim extends JFrame
 
     boolean shown = false;
 
+    public double getT() {
+        return t;
+    }
+
+    public Dimension getWinSize() {
+        return winSize;
+    }
+
+    public Container getContainer() {
+        return main;
+    }
+
+    public double getTimeStep() {
+        return timeStep;
+    }
+
     public void triggerShow() {
         if (!shown) {
             show();
@@ -648,7 +666,7 @@ public class CirSim extends JFrame
 
     CheckboxMenuItem getClassCheckItem(String s, String t) {
         try {
-            Class c = Class.forName("com.falstad.circuit." + t);
+            Class c = Class.forName("com.falstad.circuit.elements." + t);
             CircuitElm elm = constructElement(c, 0, 0);
             register(c, elm);
             if (elm.needsShortcut()) {
@@ -1001,10 +1019,10 @@ public class CirSim extends JFrame
         // unused scopes/columns
         int pos = -1;
         for (i = 0; i < scopeCount; i++) {
-            if (locateElm(scopes[i].elm) < 0) {
+            if (locateElm(scopes[i].getElm()) < 0) {
                 scopes[i].setElm(null);
             }
-            if (scopes[i].elm == null) {
+            if (scopes[i].getElm() == null) {
                 int j;
                 for (j = i; j != scopeCount; j++) {
                     scopes[j] = scopes[j + 1];
@@ -1013,12 +1031,12 @@ public class CirSim extends JFrame
                 i--;
                 continue;
             }
-            if (scopes[i].position > pos + 1) {
-                scopes[i].position = pos + 1;
+            if (scopes[i].getPosition() > pos + 1) {
+                scopes[i].setPosition(pos + 1);
             }
-            pos = scopes[i].position;
+            pos = scopes[i].getPosition();
         }
-        while (scopeCount > 0 && scopes[scopeCount - 1].elm == null) {
+        while (scopeCount > 0 && scopes[scopeCount - 1].getElm() == null) {
             scopeCount--;
         }
         int h = winSize.height - circuitArea.height;
@@ -1027,8 +1045,8 @@ public class CirSim extends JFrame
             scopeColCount[i] = 0;
         }
         for (i = 0; i != scopeCount; i++) {
-            pos = max(scopes[i].position, pos);
-            scopeColCount[scopes[i].position]++;
+            pos = max(scopes[i].getPosition(), pos);
+            scopeColCount[scopes[i].getPosition()]++;
         }
         int colct = pos + 1;
         int iw = infoWidth;
@@ -1046,20 +1064,20 @@ public class CirSim extends JFrame
         int speed = 0;
         for (i = 0; i != scopeCount; i++) {
             Scope s = scopes[i];
-            if (s.position > pos) {
-                pos = s.position;
+            if (s.getPosition() > pos) {
+                pos = s.getPosition();
                 colh = h / scopeColCount[pos];
                 row = 0;
-                speed = s.speed;
+                speed = s.getSpeed();
             }
-            if (s.speed != speed) {
-                s.speed = speed;
+            if (s.getSpeed() != speed) {
+                s.setSpeed(speed);
                 s.resetGraph();
             }
             Rectangle r = new Rectangle(pos * w, winSize.height - h + colh * row,
                     w - marg, colh);
             row++;
-            if (!r.equals(s.rect)) {
+            if (!r.equals(s.getRect())) {
                 s.setRect(r);
             }
         }
@@ -1080,8 +1098,8 @@ public class CirSim extends JFrame
             }
             InductorElm ie = (InductorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
-            return "res.f = " + CircuitElm.getUnitText(1 / (2 * pi * Math.sqrt(ie.inductance
-                    * ce.capacitance)), "Hz");
+            return "res.f = " + CircuitElm.getUnitText(1 / (2 * pi * Math.sqrt(ie.getInductance()
+                    * ce.getCapacitance())), "Hz");
         }
         if (hintType == HINT_RC) {
             if (!(c1 instanceof ResistorElm)) {
@@ -1092,7 +1110,7 @@ public class CirSim extends JFrame
             }
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
-            return "RC = " + CircuitElm.getUnitText(re.resistance * ce.capacitance,
+            return "RC = " + CircuitElm.getUnitText(re.getResistance() * ce.getCapacitance(),
                     "s");
         }
         if (hintType == HINT_3DB_C) {
@@ -1105,7 +1123,7 @@ public class CirSim extends JFrame
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(1 / (2 * pi * re.resistance * ce.capacitance), "Hz");
+                    + CircuitElm.getUnitText(1 / (2 * pi * re.getResistance() * ce.getCapacitance()), "Hz");
         }
         if (hintType == HINT_3DB_L) {
             if (!(c1 instanceof ResistorElm)) {
@@ -1117,7 +1135,7 @@ public class CirSim extends JFrame
             ResistorElm re = (ResistorElm) c1;
             InductorElm ie = (InductorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(re.resistance / (2 * pi * ie.inductance), "Hz");
+                    + CircuitElm.getUnitText(re.getResistance() / (2 * pi * ie.getInductance()), "Hz");
         }
         if (hintType == HINT_TWINT) {
             if (!(c1 instanceof ResistorElm)) {
@@ -1129,7 +1147,7 @@ public class CirSim extends JFrame
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "fc = "
-                    + CircuitElm.getUnitText(1 / (2 * pi * re.resistance * ce.capacitance), "Hz");
+                    + CircuitElm.getUnitText(1 / (2 * pi * re.getResistance() * ce.getCapacitance()), "Hz");
         }
         return null;
     }
@@ -1633,7 +1651,55 @@ public class CirSim extends JFrame
         }
     }
 
-    class FindPathInfo {
+    public int elmListSize() {
+        return elmList.size();
+    }
+
+    public int nodeListSize() {
+        return nodeList.size();
+    }
+
+    public CircuitElm getDragElm() {
+        return dragElm;
+    }
+
+    public int getGridSize() {
+        return gridSize;
+    }
+
+    public void setConverged(boolean converged) {
+        this.converged = converged;
+    }
+
+    void setTimeStep(double timeStep) {
+        this.timeStep = timeStep;
+    }
+
+    public CircuitElm getPlotXElm() {
+        return plotXElm;
+    }
+
+    public CircuitElm getPlotYElm() {
+        return plotYElm;
+    }
+
+    public void setAnalyzeFlag(boolean analyzeFlag) {
+        this.analyzeFlag = analyzeFlag;
+    }
+
+    public int getSubIterations() {
+        return subIterations;
+    }
+
+    public boolean useBufferedImage() {
+        return useBufferedImage;
+    }
+
+    public Canvas getCircuitCanvas() {
+        return cv;
+    }
+
+    public class FindPathInfo {
 
         static final int INDUCT = 1;
         static final int VOLTAGE = 2;
@@ -1750,7 +1816,7 @@ public class CirSim extends JFrame
         }
     }
 
-    void stop(String s, CircuitElm ce) {
+    public void stop(String s, CircuitElm ce) {
         stopMessage = s;
         circuitMatrix = null;
         stopElm = ce;
@@ -1761,14 +1827,14 @@ public class CirSim extends JFrame
 
     // control voltage source vs with voltage from n1 to n2 (must
     // also call stampVoltageSource())
-    void stampVCVS(int n1, int n2, double coef, int vs) {
+    public void stampVCVS(int n1, int n2, double coef, int vs) {
         int vn = nodeList.size() + vs;
         stampMatrix(vn, n1, coef);
         stampMatrix(vn, n2, -coef);
     }
 
     // stamp independent voltage source #vs, from n1 to n2, amount v
-    void stampVoltageSource(int n1, int n2, int vs, double v) {
+    public void stampVoltageSource(int n1, int n2, int vs, double v) {
         int vn = nodeList.size() + vs;
         stampMatrix(vn, n1, -1);
         stampMatrix(vn, n2, 1);
@@ -1778,7 +1844,7 @@ public class CirSim extends JFrame
     }
 
     // use this if the amount of voltage is going to be updated in doStep()
-    void stampVoltageSource(int n1, int n2, int vs) {
+    public void stampVoltageSource(int n1, int n2, int vs) {
         int vn = nodeList.size() + vs;
         stampMatrix(vn, n1, -1);
         stampMatrix(vn, n2, 1);
@@ -1787,12 +1853,12 @@ public class CirSim extends JFrame
         stampMatrix(n2, vn, -1);
     }
 
-    void updateVoltageSource(int n1, int n2, int vs, double v) {
+    public void updateVoltageSource(int n1, int n2, int vs, double v) {
         int vn = nodeList.size() + vs;
         stampRightSide(vn, v);
     }
 
-    void stampResistor(int n1, int n2, double r) {
+    public void stampResistor(int n1, int n2, double r) {
         double r0 = 1 / r;
         if (Double.isNaN(r0) || Double.isInfinite(r0)) {
             System.out.print("bad resistance " + r + " " + r0 + "\n");
@@ -1805,7 +1871,7 @@ public class CirSim extends JFrame
         stampMatrix(n2, n1, -r0);
     }
 
-    void stampConductance(int n1, int n2, double r0) {
+    public void stampConductance(int n1, int n2, double r0) {
         stampMatrix(n1, n1, r0);
         stampMatrix(n2, n2, r0);
         stampMatrix(n1, n2, -r0);
@@ -1813,20 +1879,20 @@ public class CirSim extends JFrame
     }
 
     // current from cn1 to cn2 is equal to voltage from vn1 to 2, divided by g
-    void stampVCCurrentSource(int cn1, int cn2, int vn1, int vn2, double g) {
+    public void stampVCCurrentSource(int cn1, int cn2, int vn1, int vn2, double g) {
         stampMatrix(cn1, vn1, g);
         stampMatrix(cn2, vn2, g);
         stampMatrix(cn1, vn2, -g);
         stampMatrix(cn2, vn1, -g);
     }
 
-    void stampCurrentSource(int n1, int n2, double i) {
+    public void stampCurrentSource(int n1, int n2, double i) {
         stampRightSide(n1, -i);
         stampRightSide(n2, i);
     }
 
     // stamp a current source from n1 to n2 depending on current through vs
-    void stampCCCS(int n1, int n2, int vs, double gain) {
+    public void stampCCCS(int n1, int n2, int vs, double gain) {
         int vn = nodeList.size() + vs;
         stampMatrix(n1, vn, gain);
         stampMatrix(n2, vn, -gain);
@@ -1835,7 +1901,7 @@ public class CirSim extends JFrame
     // stamp value x in row i, column j, meaning that a voltage change
     // of dv in node j will increase the current into node i by x dv.
     // (Unless i or j is a voltage source node.)
-    void stampMatrix(int i, int j, double x) {
+    public void stampMatrix(int i, int j, double x) {
         if (i > 0 && j > 0) {
             if (circuitNeedsMap) {
                 i = circuitRowInfo[i - 1].mapRow;
@@ -1857,7 +1923,7 @@ public class CirSim extends JFrame
 
     // stamp value x on the right side of row i, representing an
     // independent current source flowing into node i
-    void stampRightSide(int i, double x) {
+    public void stampRightSide(int i, double x) {
         if (i > 0) {
             if (circuitNeedsMap) {
                 i = circuitRowInfo[i - 1].mapRow;
@@ -1870,7 +1936,7 @@ public class CirSim extends JFrame
     }
 
     // indicate that the value on the right side of row i changes in doStep()
-    void stampRightSide(int i) {
+    public void stampRightSide(int i) {
         //System.out.println("rschanges true " + (i-1));
         if (i > 0) {
             circuitRowInfo[i - 1].rsChanges = true;
@@ -1878,13 +1944,13 @@ public class CirSim extends JFrame
     }
 
     // indicate that the values on the left side of row i change in doStep()
-    void stampNonLinear(int i) {
+    public void stampNonLinear(int i) {
         if (i > 0) {
             circuitRowInfo[i - 1].lsChanges = true;
         }
     }
 
-    double getIterCount() {
+    public double getIterCount() {
         if (speedBar.getValue() == 0) {
             return 0;
         }
@@ -1895,7 +1961,7 @@ public class CirSim extends JFrame
     boolean converged;
     int subIterations;
 
-    void runCircuit() {
+    public void runCircuit() {
         if (circuitMatrix == null || elmList.size() == 0) {
             circuitMatrix = null;
             return;
@@ -2024,15 +2090,15 @@ public class CirSim extends JFrame
         //System.out.println((System.currentTimeMillis()-lastFrameTime)/(double) iter);
     }
 
-    int min(int a, int b) {
+    public int min(int a, int b) {
         return (a < b) ? a : b;
     }
 
-    int max(int a, int b) {
+    public int max(int a, int b) {
         return (a > b) ? a : b;
     }
 
-    void editFuncPoint(int x, int y) {
+    public void editFuncPoint(int x, int y) {
         // XXX
         cv.repaint(pause);
     }
@@ -2133,7 +2199,7 @@ public class CirSim extends JFrame
         if (e.getSource() == elmScopeMenuItem && menuElm != null) {
             int i;
             for (i = 0; i != scopeCount; i++) {
-                if (scopes[i].elm == null) {
+                if (scopes[i].getElm() == null) {
                     break;
                 }
             }
@@ -2143,7 +2209,7 @@ public class CirSim extends JFrame
                 }
                 scopeCount++;
                 scopes[i] = new Scope(this);
-                scopes[i].position = i;
+                scopes[i].setPosition(i);
                 handleResize();
             }
             scopes[i].setElm(menuElm);
@@ -2192,12 +2258,12 @@ public class CirSim extends JFrame
             }
             s = 1;
         }
-        if (scopes[s].position == scopes[s - 1].position) {
+        if (scopes[s].getPosition() == scopes[s - 1].getPosition()) {
             return;
         }
-        scopes[s].position = scopes[s - 1].position;
+        scopes[s].setPosition(scopes[s - 1].getPosition());
         for (s++; s < scopeCount; s++) {
-            scopes[s].position--;
+            scopes[s].setPosition(scopes[s].getPosition() - 1);
         }
     }
 
@@ -2208,27 +2274,28 @@ public class CirSim extends JFrame
             }
             s = 1;
         }
-        if (scopes[s].position != scopes[s - 1].position) {
+        if (scopes[s].getPosition() != scopes[s - 1].getPosition()) {
             return;
         }
         for (; s < scopeCount; s++) {
-            scopes[s].position++;
+            scopes[s].setPosition(scopes[s].getPosition() + 1);
         }
     }
 
     void stackAll() {
         int i;
         for (i = 0; i != scopeCount; i++) {
-            scopes[i].position = 0;
-            scopes[i].showMax = scopes[i].showMin = false;
+            scopes[i].setPosition(0);
+            scopes[i].showMax(false);
+            scopes[i].showMin(false);
         }
     }
 
     void unstackAll() {
         int i;
         for (i = 0; i != scopeCount; i++) {
-            scopes[i].position = i;
-            scopes[i].showMax = true;
+            scopes[i].setPosition(i);
+            scopes[i].showMax(true);
         }
     }
 
@@ -2264,8 +2331,8 @@ public class CirSim extends JFrame
         if (expDialog == null) {
 //            expDialog = ImportExportDialogFactory.Create(this,
 //                    ImportExportDialog.Action.EXPORT);
-	    expDialog = new ImportExportClipboardDialog(this,
-		 ImportExportDialog.Action.EXPORT);
+            expDialog = new ImportExportClipboardDialog(this,
+                    ImportExportDialog.Action.EXPORT);
         }
         expDialog.setDump(dump);
         expDialog.execute();
@@ -2397,7 +2464,7 @@ public class CirSim extends JFrame
         }
     }
 
-    public void readSetup(String text) {
+    void readSetup(String text) {
         readSetup(text, false);
     }
 
@@ -2470,7 +2537,7 @@ public class CirSim extends JFrame
                 try {
                     if (tint == 'o') {
                         Scope sc = new Scope(this);
-                        sc.position = scopeCount;
+                        sc.setPosition(scopeCount);
                         sc.undump(st);
                         scopes[scopeCount++] = sc;
                         break;
@@ -2568,7 +2635,7 @@ public class CirSim extends JFrame
         setGrid();
     }
 
-    int snapGrid(int x) {
+    public int snapGrid(int x) {
         return (x + gridRound) & gridMask;
     }
 
@@ -2578,14 +2645,14 @@ public class CirSim extends JFrame
         }
         SwitchElm se = (SwitchElm) mouseElm;
         se.toggle();
-        if (se.momentary) {
+        if (se.isMomentary()) {
             heldSwitchElm = se;
         }
         needAnalyze();
         return true;
     }
 
-    int locateElm(CircuitElm elm) {
+    public int locateElm(CircuitElm elm) {
         int i;
         for (i = 0; i != elmList.size(); i++) {
             if (elm == elmList.elementAt(i)) {
@@ -2858,7 +2925,7 @@ public class CirSim extends JFrame
         if (mouseElm == null) {
             for (i = 0; i != scopeCount; i++) {
                 Scope s = scopes[i];
-                if (s.rect.contains(x, y)) {
+                if (s.getRect().contains(x, y)) {
                     s.select();
                     scopeSelected = i;
                 }
@@ -3149,7 +3216,7 @@ public class CirSim extends JFrame
                 setMouseMode(MODE_SELECT);
             } else if (s.length() > 0) {
                 try {
-                    addingClass = Class.forName("com.falstad.circuit." + s);
+                    addingClass = Class.forName("com.falstad.circuit.elements." + s);
                 } catch (Exception ee) {
                     ee.printStackTrace();
                 }

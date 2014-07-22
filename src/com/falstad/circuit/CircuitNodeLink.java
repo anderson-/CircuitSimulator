@@ -1,6 +1,6 @@
 package com.falstad.circuit;
 
-    class CircuitNodeLink {
+    public class CircuitNodeLink {
 	int num;
 	CircuitElm elm;
     }

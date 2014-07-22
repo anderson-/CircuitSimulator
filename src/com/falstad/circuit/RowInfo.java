@@ -1,7 +1,7 @@
 package com.falstad.circuit;
 
     // info about each row/column of the matrix for simplification purposes
-    class RowInfo {
+    public class RowInfo {
 	static final int ROW_NORMAL = 0;  // ordinary value
 	static final int ROW_CONST  = 1;  // value is constant
 	static final int ROW_EQUAL  = 2;  // value is equal to another value
