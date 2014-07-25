@@ -7,9 +7,9 @@ import java.util.StringTokenizer;
 
 public class SwitchElm extends CircuitElm {
 
-    boolean momentary;
+    protected boolean momentary;
     // position 0 == closed, position 1 == open
-    int position, posCount;
+    protected int position, posCount;
 
     public SwitchElm(int xx, int yy) {
         super(xx, yy);
@@ -18,7 +18,7 @@ public class SwitchElm extends CircuitElm {
         posCount = 2;
     }
 
-    SwitchElm(int xx, int yy, boolean mm) {
+    public SwitchElm(int xx, int yy, boolean mm) {
         super(xx, yy);
         position = (mm) ? 1 : 0;
         momentary = mm;

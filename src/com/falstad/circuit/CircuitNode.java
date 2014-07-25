@@ -2,9 +2,13 @@ package com.falstad.circuit;
 
 import java.util.Vector;
 
-class CircuitNode {
-    int x, y;
-    Vector<CircuitNodeLink> links;
-    boolean internal;
-    CircuitNode() { links = new Vector<CircuitNodeLink>(); }
+public class CircuitNode {
+
+    public int x, y;
+    public Vector<CircuitNodeLink> links;
+    public boolean internal;
+
+    public CircuitNode() {
+        links = new Vector<CircuitNodeLink>();
+    }
 }

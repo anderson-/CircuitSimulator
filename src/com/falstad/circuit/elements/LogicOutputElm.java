@@ -10,8 +10,8 @@ public class LogicOutputElm extends CircuitElm {
     final int FLAG_TERNARY = 1;
     final int FLAG_NUMERIC = 2;
     final int FLAG_PULLDOWN = 4;
-    double threshold;
-    String value;
+    protected double threshold;
+    protected String value;
 
     public LogicOutputElm(int xx, int yy) {
         super(xx, yy);
@@ -40,11 +40,11 @@ public class LogicOutputElm extends CircuitElm {
         return 1;
     }
 
-    boolean isTernary() {
+    protected boolean isTernary() {
         return (flags & FLAG_TERNARY) != 0;
     }
 
-    boolean isNumeric() {
+    protected boolean isNumeric() {
         return (flags & (FLAG_TERNARY | FLAG_NUMERIC)) != 0;
     }
 

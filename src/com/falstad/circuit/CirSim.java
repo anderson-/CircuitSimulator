@@ -165,7 +165,7 @@ public class CirSim extends Frame
     CircuitCanvas cv;
     Circuit applet;
 
-    CirSim(Circuit a) {
+    public CirSim(Circuit a) {
         super("Circuit Simulator v1.6h");
         applet = a;
         useFrame = false;
@@ -173,7 +173,7 @@ public class CirSim extends Frame
 
     String startCircuit = null;
     String startLabel = null;
-    String startCircuitText = null;
+    public String startCircuitText = null;
     String baseURL = "http://www.falstad.com/circuit/";
 
     public void init() {
@@ -544,6 +544,12 @@ public class CirSim extends Frame
         if (useFrame) {
             setMenuBar(mb);
         }
+        
+        
+    }
+
+    public void posInit() {
+        
         if (startCircuitText != null) {
             readSetup(startCircuitText);
         } else if (stopMessage == null && startCircuit != null) {
@@ -686,7 +692,7 @@ public class CirSim extends Frame
         return mi;
     }
 
-    void register(Class c, CircuitElm elm) {
+    public void register(Class c, CircuitElm elm) {
         int t = elm.getDumpType();
         if (t == 0) {
             System.out.println("no dump type: " + c);
@@ -1962,7 +1968,7 @@ public class CirSim extends Frame
     int subIterations;
 
     public void runCircuit() {
-        if (circuitMatrix == null || elmList.size() == 0) {
+        if (circuitMatrix == null || elmList.isEmpty()) {
             circuitMatrix = null;
             return;
         }
@@ -2464,11 +2470,11 @@ public class CirSim extends Frame
         }
     }
 
-    void readSetup(String text) {
+    public void readSetup(String text) {
         readSetup(text, false);
     }
 
-    void readSetup(String text, boolean retain) {
+    public void readSetup(String text, boolean retain) {
         readSetup(text.getBytes(), text.length(), retain);
         titleLabel.setText("untitled");
     }
@@ -3051,7 +3057,7 @@ public class CirSim extends Frame
         dragElm = constructElement(addingClass, x0, y0);
     }
 
-    CircuitElm constructElement(Class c, int x0, int y0) {
+    public CircuitElm constructElement(Class c, int x0, int y0) {
         // find element class
         Class carr[] = new Class[2];
         //carr[0] = getClass();

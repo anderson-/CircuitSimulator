@@ -35,7 +35,7 @@ public class LogicInputElm extends SwitchElm {
         return (flags & FLAG_TERNARY) != 0;
     }
 
-    boolean isNumeric() {
+    public boolean isNumeric() {
         return (flags & (FLAG_TERNARY | FLAG_NUMERIC)) != 0;
     }
 
