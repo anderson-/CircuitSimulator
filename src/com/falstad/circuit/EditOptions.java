@@ -3,8 +3,8 @@ package com.falstad.circuit;
 import com.falstad.circuit.EditDialog.Editable;
 
 class EditOptions implements Editable {
-    CirSim sim;
-    public EditOptions(CirSim s) { sim = s; }
+    CircuitSimulator sim;
+    public EditOptions(CircuitSimulator s) { sim = s; }
     public EditInfo getEditInfo(int n) {
 	if (n == 0)
 	    return new EditInfo("Time step size (s)", sim.getTimeStep(), 0, 0);

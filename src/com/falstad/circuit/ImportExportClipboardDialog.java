@@ -9,15 +9,15 @@ class ImportExportClipboardDialog
         extends Dialog
         implements ImportExportDialog, ActionListener {
 
-    CirSim cframe;
+    CircuitSimulator cframe;
     Button importButton, closeButton;
     TextArea text;
     Action type;
 
     Clipboard clipboard = null;
 
-    ImportExportClipboardDialog(CirSim f, Action type) {
-        super(f, (type == Action.EXPORT) ? "Export" : "Import", false);
+    ImportExportClipboardDialog(CircuitSimulator f, Action type) {
+        super((Frame)null, (type == Action.EXPORT) ? "Export" : "Import", false);
         cframe = f;
         setLayout(new ImportExportDialogLayout());
         add(text = new TextArea("", 10, 60, TextArea.SCROLLBARS_BOTH));
@@ -75,7 +75,7 @@ class ImportExportClipboardDialog
 
     public boolean handleEvent(Event ev) {
         if (ev.id == Event.WINDOW_DESTROY) {
-            CirSim.main.requestFocus();
+            cframe.getContainer().requestFocus();
             setVisible(false);
             cframe.impDialog = null;
             return true;

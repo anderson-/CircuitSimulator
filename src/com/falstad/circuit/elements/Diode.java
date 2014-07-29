@@ -1,13 +1,13 @@
 package com.falstad.circuit.elements;
 
-import com.falstad.circuit.CirSim;
+import com.falstad.circuit.CircuitSimulator;
 
 class Diode {
 
     int nodes[];
-    CirSim sim;
+    CircuitSimulator sim;
 
-    Diode(CirSim s) {
+    Diode(CircuitSimulator s) {
         sim = s;
         nodes = new int[2];
     }

@@ -73,7 +73,7 @@ public class CapacitorElm extends CircuitElm {
         drawThickLine(g, point1, lead1);
         setPowerColor(g, false);
         drawThickLine(g, plate1[0], plate1[1]);
-        if (sim.powerCheckItem.getState()) {
+        if (sim.isShowingPowerDissipation()) {
             g.setColor(Color.gray);
         }
 
@@ -89,7 +89,7 @@ public class CapacitorElm extends CircuitElm {
             drawDots(g, point2, lead2, -curcount);
         }
         drawPosts(g);
-        if (sim.showValuesCheckItem.getState()) {
+        if (sim.isShowingValues()) {
             String s = getShortUnitText(capacitance, "F");
             drawValues(g, s, hs);
         }

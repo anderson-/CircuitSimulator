@@ -1,19 +1,19 @@
 package com.falstad.circuit.elements;
 
-import com.falstad.circuit.CirSim;
+import com.falstad.circuit.CircuitSimulator;
 
 class Inductor {
 
     public static final int FLAG_BACK_EULER = 2;
     int nodes[];
     int flags;
-    CirSim sim;
+    CircuitSimulator sim;
 
     double inductance;
     double compResistance, current;
     double curSourceValue;
 
-    Inductor(CirSim s) {
+    Inductor(CircuitSimulator s) {
         sim = s;
         nodes = new int[2];
     }

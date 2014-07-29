@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
 	}
 	void setColor(Graphics g, int p) {
 	    g.setColor(pins[p].value ? Color.red :
-		       sim.printableCheckItem.getState() ? Color.white : darkred);
+		       sim.whiteBackground() ? Color.white : darkred);
 	}
 	public int getPostCount() { return 7; }
 	public int getVoltageSourceCount() { return 0; }

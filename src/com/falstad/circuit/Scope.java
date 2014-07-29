@@ -11,8 +11,32 @@ import java.awt.image.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 public class Scope {
+
+    static JCheckBoxMenuItem scopeVMenuItem;
+    static JCheckBoxMenuItem scopeIMenuItem;
+    static JCheckBoxMenuItem scopeMaxMenuItem;
+    static JCheckBoxMenuItem scopeMinMenuItem;
+    static JCheckBoxMenuItem scopeFreqMenuItem;
+    static JCheckBoxMenuItem scopePowerMenuItem;
+    static JCheckBoxMenuItem scopeIbMenuItem;
+    static JCheckBoxMenuItem scopeIcMenuItem;
+    static JCheckBoxMenuItem scopeIeMenuItem;
+    static JCheckBoxMenuItem scopeVbeMenuItem;
+    static JCheckBoxMenuItem scopeVbcMenuItem;
+    static JCheckBoxMenuItem scopeVceMenuItem;
+    static JCheckBoxMenuItem scopeVIMenuItem;
+    static JCheckBoxMenuItem scopeXYMenuItem;
+    static JCheckBoxMenuItem scopeResistMenuItem;
+    static JCheckBoxMenuItem scopeVceIcMenuItem;
+    static JPopupMenu scopeMenu;
+    static JPopupMenu transScopeMenu;
+    static JMenuItem elmScopeMenuItem;
+    static JMenuItem scopeSelectYMenuItem;
 
     final int FLAG_YELM = 32;
     public static final int VAL_POWER = 1;
@@ -37,9 +61,9 @@ public class Scope {
     int pixels[];
     int draw_ox, draw_oy;
     float dpixels[];
-    CirSim sim;
+    CircuitSimulator sim;
 
-    public Scope(CirSim s) {
+    public Scope(CircuitSimulator s) {
         rect = new Rectangle();
         reset();
         sim = s;
@@ -124,7 +148,7 @@ public class Scope {
     public Rectangle getRect() {
         return rect;
     }
-    
+
     public void setPosition(int position) {
         this.position = position;
     }
@@ -140,7 +164,7 @@ public class Scope {
     public void setSpeed(int speed) {
         this.speed = speed;
     }
-    
+
     public int rightEdge() {
         return rect.x + rect.width;
     }
@@ -214,7 +238,7 @@ public class Scope {
         if (draw_ox == x2 && draw_oy == y2) {
             dpixels[x2 + rect.width * y2] = 1;
         } else if (CircuitElm.abs(y2 - draw_oy) > CircuitElm.abs(x2 - draw_ox)) {
-	    // y difference is greater, so we step along y's
+            // y difference is greater, so we step along y's
             // from min to max y and calculate x for each step
             double sgn = CircuitElm.sign(y2 - draw_oy);
             int x, y;
@@ -223,7 +247,7 @@ public class Scope {
                 dpixels[x + rect.width * y] = 1;
             }
         } else {
-	    // x difference is greater, so we step along x's
+            // x difference is greater, so we step along x's
             // from min to max x and calculate y for each step
             double sgn = CircuitElm.sign(x2 - draw_ox);
             int x, y;
@@ -254,7 +278,7 @@ public class Scope {
         if (pixels == null || dpixels == null) {
             return;
         }
-        int col = (sim.printableCheckItem.getState()) ? 0xFFFFFFFF : 0;
+        int col = (sim.whiteBackground()) ? 0xFFFFFFFF : 0;
         for (i = 0; i != pixels.length; i++) {
             pixels[i] = col;
         }
@@ -295,7 +319,7 @@ public class Scope {
             return;
         }
         int i;
-        int col = (sim.printableCheckItem.getState()) ? 0xFFFFFFFF : 0;
+        int col = (sim.whiteBackground()) ? 0xFFFFFFFF : 0;
         for (i = 0; i != pixels.length; i++) {
             pixels[i] = col;
         }
@@ -344,7 +368,7 @@ public class Scope {
         int ll;
         boolean sublines = (maxy * gridStep / gridMax > 3);
         for (ll = -100; ll <= 100; ll++) {
-	    // don't show gridlines if plotting multiple values,
+            // don't show gridlines if plotting multiple values,
             // or if lines are too close together (except for center line)
             if (ll != 0 && ((showI && showV) || gridStep == 0)) {
                 continue;
@@ -398,7 +422,7 @@ public class Scope {
             }
         }
 
-	// these two loops are pretty much the same, and should be
+        // these two loops are pretty much the same, and should be
         // combined!
         if (value == 0 && showI) {
             int ox = -1, oy = -1;
@@ -485,7 +509,7 @@ public class Scope {
         }
         double freq = 0;
         if (showFreq) {
-	    // try to get frequency
+            // try to get frequency
             // get average
             double avg = 0;
             for (i = 0; i != rect.width; i++) {
@@ -591,32 +615,32 @@ public class Scope {
         resetGraph();
     }
 
-    public PopupMenu getMenu() {
+    public JPopupMenu getMenu() {
         if (elm == null) {
             return null;
         }
         if (elm instanceof TransistorElm) {
-            sim.scopeIbMenuItem.setState(value == VAL_IB);
-            sim.scopeIcMenuItem.setState(value == VAL_IC);
-            sim.scopeIeMenuItem.setState(value == VAL_IE);
-            sim.scopeVbeMenuItem.setState(value == VAL_VBE);
-            sim.scopeVbcMenuItem.setState(value == VAL_VBC);
-            sim.scopeVceMenuItem.setState(value == VAL_VCE && ivalue != VAL_IC);
-            sim.scopeVceIcMenuItem.setState(value == VAL_VCE && ivalue == VAL_IC);
-            return sim.transScopeMenu;
+            scopeIbMenuItem.setState(value == VAL_IB);
+            scopeIcMenuItem.setState(value == VAL_IC);
+            scopeIeMenuItem.setState(value == VAL_IE);
+            scopeVbeMenuItem.setState(value == VAL_VBE);
+            scopeVbcMenuItem.setState(value == VAL_VBC);
+            scopeVceMenuItem.setState(value == VAL_VCE && ivalue != VAL_IC);
+            scopeVceIcMenuItem.setState(value == VAL_VCE && ivalue == VAL_IC);
+            return transScopeMenu;
         } else {
-            sim.scopeVMenuItem.setState(showV && value == 0);
-            sim.scopeIMenuItem.setState(showI && value == 0);
-            sim.scopeMaxMenuItem.setState(showMax);
-            sim.scopeMinMenuItem.setState(showMin);
-            sim.scopeFreqMenuItem.setState(showFreq);
-            sim.scopePowerMenuItem.setState(value == VAL_POWER);
-            sim.scopeVIMenuItem.setState(plot2d && !plotXY);
-            sim.scopeXYMenuItem.setState(plotXY);
-            sim.scopeSelectYMenuItem.setEnabled(plotXY);
-            sim.scopeResistMenuItem.setState(value == VAL_R);
-            sim.scopeResistMenuItem.setEnabled(elm instanceof MemristorElm);
-            return sim.scopeMenu;
+            scopeVMenuItem.setState(showV && value == 0);
+            scopeIMenuItem.setState(showI && value == 0);
+            scopeMaxMenuItem.setState(showMax);
+            scopeMinMenuItem.setState(showMin);
+            scopeFreqMenuItem.setState(showFreq);
+            scopePowerMenuItem.setState(value == VAL_POWER);
+            scopeVIMenuItem.setState(plot2d && !plotXY);
+            scopeXYMenuItem.setState(plotXY);
+            scopeSelectYMenuItem.setEnabled(plotXY);
+            scopeResistMenuItem.setState(value == VAL_R);
+            scopeResistMenuItem.setEnabled(elm instanceof MemristorElm);
+            return scopeMenu;
         }
     }
 
@@ -746,44 +770,78 @@ public class Scope {
         draw_ox = draw_oy = -1;
     }
 
+    public static JPopupMenu buildScopeMenu(boolean t, CircuitSimulator sim) {
+        JPopupMenu m = new JPopupMenu();
+        m.add(sim.getGUI().getMenuItem("Remove", "remove"));
+        m.add(sim.getGUI().getMenuItem("Speed 2x", "speed2"));
+        m.add(sim.getGUI().getMenuItem("Speed 1/2x", "speed1/2"));
+        m.add(sim.getGUI().getMenuItem("Scale 2x", "scale"));
+        m.add(sim.getGUI().getMenuItem("Max Scale", "maxscale"));
+        m.add(sim.getGUI().getMenuItem("Stack", "stack"));
+        m.add(sim.getGUI().getMenuItem("Unstack", "unstack"));
+        m.add(sim.getGUI().getMenuItem("Reset", "reset"));
+        if (t) {
+            m.add(scopeIbMenuItem = sim.getGUI().getCheckItem("Show Ib"));
+            m.add(scopeIcMenuItem = sim.getGUI().getCheckItem("Show Ic"));
+            m.add(scopeIeMenuItem = sim.getGUI().getCheckItem("Show Ie"));
+            m.add(scopeVbeMenuItem = sim.getGUI().getCheckItem("Show Vbe"));
+            m.add(scopeVbcMenuItem = sim.getGUI().getCheckItem("Show Vbc"));
+            m.add(scopeVceMenuItem = sim.getGUI().getCheckItem("Show Vce"));
+            m.add(scopeVceIcMenuItem = sim.getGUI().getCheckItem("Show Vce vs Ic"));
+        } else {
+            m.add(scopeVMenuItem = sim.getGUI().getCheckItem("Show Voltage"));
+            m.add(scopeIMenuItem = sim.getGUI().getCheckItem("Show Current"));
+            m.add(scopePowerMenuItem = sim.getGUI().getCheckItem("Show Power Consumed"));
+            m.add(scopeMaxMenuItem = sim.getGUI().getCheckItem("Show Peak Value"));
+            m.add(scopeMinMenuItem = sim.getGUI().getCheckItem("Show Negative Peak Value"));
+            m.add(scopeFreqMenuItem = sim.getGUI().getCheckItem("Show Frequency"));
+            m.add(scopeVIMenuItem = sim.getGUI().getCheckItem("Show V vs I"));
+            m.add(scopeXYMenuItem = sim.getGUI().getCheckItem("Plot X/Y"));
+            m.add(scopeSelectYMenuItem = sim.getGUI().getMenuItem("Select Y", "selecty"));
+            m.add(scopeResistMenuItem = sim.getGUI().getCheckItem("Show Resistance"));
+        }
+//        main.add(m);
+        return m;
+    }
+
     public void handleMenu(ItemEvent e, Object mi) {
-        if (mi == sim.scopeVMenuItem) {
-            showVoltage(sim.scopeVMenuItem.getState());
+        if (mi == scopeVMenuItem) {
+            showVoltage(scopeVMenuItem.getState());
         }
-        if (mi == sim.scopeIMenuItem) {
-            showCurrent(sim.scopeIMenuItem.getState());
+        if (mi == scopeIMenuItem) {
+            showCurrent(scopeIMenuItem.getState());
         }
-        if (mi == sim.scopeMaxMenuItem) {
-            showMax(sim.scopeMaxMenuItem.getState());
+        if (mi == scopeMaxMenuItem) {
+            showMax(scopeMaxMenuItem.getState());
         }
-        if (mi == sim.scopeMinMenuItem) {
-            showMin(sim.scopeMinMenuItem.getState());
+        if (mi == scopeMinMenuItem) {
+            showMin(scopeMinMenuItem.getState());
         }
-        if (mi == sim.scopeFreqMenuItem) {
-            showFreq(sim.scopeFreqMenuItem.getState());
+        if (mi == scopeFreqMenuItem) {
+            showFreq(scopeFreqMenuItem.getState());
         }
-        if (mi == sim.scopePowerMenuItem) {
+        if (mi == scopePowerMenuItem) {
             setValue(VAL_POWER);
         }
-        if (mi == sim.scopeIbMenuItem) {
+        if (mi == scopeIbMenuItem) {
             setValue(VAL_IB);
         }
-        if (mi == sim.scopeIcMenuItem) {
+        if (mi == scopeIcMenuItem) {
             setValue(VAL_IC);
         }
-        if (mi == sim.scopeIeMenuItem) {
+        if (mi == scopeIeMenuItem) {
             setValue(VAL_IE);
         }
-        if (mi == sim.scopeVbeMenuItem) {
+        if (mi == scopeVbeMenuItem) {
             setValue(VAL_VBE);
         }
-        if (mi == sim.scopeVbcMenuItem) {
+        if (mi == scopeVbcMenuItem) {
             setValue(VAL_VBC);
         }
-        if (mi == sim.scopeVceMenuItem) {
+        if (mi == scopeVceMenuItem) {
             setValue(VAL_VCE);
         }
-        if (mi == sim.scopeVceIcMenuItem) {
+        if (mi == scopeVceIcMenuItem) {
             plot2d = true;
             plotXY = false;
             value = VAL_VCE;
@@ -791,19 +849,19 @@ public class Scope {
             resetGraph();
         }
 
-        if (mi == sim.scopeVIMenuItem) {
-            plot2d = sim.scopeVIMenuItem.getState();
+        if (mi == scopeVIMenuItem) {
+            plot2d = scopeVIMenuItem.getState();
             plotXY = false;
             resetGraph();
         }
-        if (mi == sim.scopeXYMenuItem) {
-            plotXY = plot2d = sim.scopeXYMenuItem.getState();
+        if (mi == scopeXYMenuItem) {
+            plotXY = plot2d = scopeXYMenuItem.getState();
             if (yElm == null) {
                 selectY();
             }
             resetGraph();
         }
-        if (mi == sim.scopeResistMenuItem) {
+        if (mi == scopeResistMenuItem) {
             setValue(VAL_R);
         }
     }

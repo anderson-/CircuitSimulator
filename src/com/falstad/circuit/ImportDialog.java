@@ -4,13 +4,13 @@ import java.awt.*;
 import java.awt.event.*;
 
 class ImportDialog extends Dialog implements ActionListener {
-    CirSim cframe;
+    CircuitSimulator cframe;
     Button importButton, closeButton;
     TextArea text;
     boolean isURL;
 	
-    ImportDialog(CirSim f, String str, boolean url) {
-	super(f, (str.length() > 0) ? "Export" : "Import", false);
+    ImportDialog(CircuitSimulator f, String str, boolean url) {
+	super((Frame)null, (str.length() > 0) ? "Export" : "Import", false);
 	isURL = url;
 	cframe = f;
 	setLayout(new ImportDialogLayout());
@@ -44,7 +44,7 @@ class ImportDialog extends Dialog implements ActionListener {
 	
     public boolean handleEvent(Event ev) {
 	if (ev.id == Event.WINDOW_DESTROY) {
-	    CirSim.main.requestFocus();
+	    cframe.getContainer().requestFocus();
 	    setVisible(false);
 	    cframe.impDialog = null;
 	    return true;

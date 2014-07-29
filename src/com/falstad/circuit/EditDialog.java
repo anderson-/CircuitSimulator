@@ -14,15 +14,15 @@ class EditDialog extends Dialog implements AdjustmentListener, ActionListener, I
         public void setEditValue(int n, EditInfo ei);
     }
     Editable elm;
-    CirSim cframe;
+    CircuitSimulator cframe;
     Button applyButton, okButton;
     EditInfo einfos[];
     int einfocount;
     final int barmax = 1000;
     NumberFormat noCommaFormat;
 
-    EditDialog(Editable ce, CirSim f) {
-        super(f, "Edit Component", false);
+    EditDialog(Editable ce, CircuitSimulator f) {
+        super((Frame)null, "Edit Component", false);
         cframe = f;
         elm = ce;
         setLayout(new EditDialogLayout());

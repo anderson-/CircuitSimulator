@@ -20,7 +20,7 @@ public class OpAmpElm extends CircuitElm {
         maxOut = 15;
         minOut = -15;
         gbw = 1e6;
-        setSize(sim.smallGridCheckItem.getState() ? 1 : 2);
+        setSize(sim.usingSmallGrid() ? 1 : 2);
         setGain();
     }
 

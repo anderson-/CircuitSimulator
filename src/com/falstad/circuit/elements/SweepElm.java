@@ -71,7 +71,7 @@ public class SweepElm extends CircuitElm {
             tm = 2000 - tm;
         }
         double w = 1 + tm * .002;
-        if (!sim.stoppedCheck.getState()) {
+        if (!sim.isStopped()) {
             w = 1 + 2 * (frequency - minF) / (maxF - minF);
         }
         for (i = -xl; i <= xl; i++) {
@@ -82,7 +82,7 @@ public class SweepElm extends CircuitElm {
             ox = xc + i;
             oy = yy;
         }
-        if (sim.showValuesCheckItem.getState()) {
+        if (sim.isShowingValues()) {
             String s = getShortUnitText(frequency, "Hz");
             if (dx == 0 || dy == 0) {
                 drawValues(g, s, circleSize);

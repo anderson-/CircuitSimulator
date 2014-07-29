@@ -15,7 +15,7 @@ abstract public class GateElm extends CircuitElm {
         super(xx, yy);
         noDiagonal = true;
         inputCount = 2;
-        setSize(sim.smallGridCheckItem.getState() ? 1 : 2);
+        setSize(sim.usingSmallGrid() ? 1 : 2);
     }
 
     public GateElm(int xa, int ya, int xb, int yb, int f,

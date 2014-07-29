@@ -20,7 +20,7 @@ abstract class ChipElm extends CircuitElm {
         }
         noDiagonal = true;
         setupPins();
-        setSize(sim.smallGridCheckItem.getState() ? 1 : 2);
+        setSize(sim.usingSmallGrid() ? 1 : 2);
     }
 
     public ChipElm(int xa, int ya, int xb, int yb, int f,
@@ -73,7 +73,7 @@ abstract class ChipElm extends CircuitElm {
             p.curcount = updateDotCount(p.current, p.curcount);
             drawDots(g, b, a, p.curcount);
             if (p.bubble) {
-                g.setColor(sim.printableCheckItem.getState()
+                g.setColor(sim.whiteBackground()
                         ? Color.white : Color.black);
                 drawThickCircle(g, p.bubbleX, p.bubbleY, 1);
                 g.setColor(lightGrayColor);

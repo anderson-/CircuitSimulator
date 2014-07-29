@@ -87,7 +87,7 @@ public class MosfetElm extends CircuitElm {
             setVoltageColor(g, pnp == 1 ? volts[1] : volts[2]);
             g.fillPolygon(arrowPoly);
         }
-        if (sim.powerCheckItem.getState()) {
+        if (sim.isShowingPowerDissipation()) {
             g.setColor(Color.gray);
         }
         setVoltageColor(g, volts[0]);

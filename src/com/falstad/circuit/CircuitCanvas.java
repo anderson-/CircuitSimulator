@@ -3,8 +3,8 @@ package com.falstad.circuit;
 import java.awt.*;
 
 class CircuitCanvas extends Canvas {
-    CirSim pg;
-    CircuitCanvas(CirSim p) {
+    CircuitSimulator pg;
+    CircuitCanvas(CircuitSimulator p) {
 	pg = p;
     }
     public Dimension getPreferredSize() {
