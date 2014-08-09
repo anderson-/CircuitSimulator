@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 	boolean modestate=false;
 	public String getChipName() { return "PISO shift register"; }
 
-	void setupPins() {
+	public void setupPins() {
 	    sizeX = 10;
 	    sizeY = 3;
 	    pins = new Pin[getPostCount()];
@@ -44,7 +44,7 @@ import java.util.StringTokenizer;
 	}
 	public int getVoltageSourceCount() {return 1;}
 
-	void execute() {
+	public void execute() {
 		if(pins[0].value&&!modestate)
 		{
 		modestate=true;

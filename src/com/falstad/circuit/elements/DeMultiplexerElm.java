@@ -22,7 +22,7 @@ public class DeMultiplexerElm extends ChipElm {
         return "Multiplexer";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 3;
         sizeY = 5;
         pins = new Pin[getPostCount()];
@@ -51,7 +51,7 @@ public class DeMultiplexerElm extends ChipElm {
         return 4;
     }
 
-    void execute() {
+    public void execute() {
         int selectedvalue = 0;
         if (pins[4].value) {
             selectedvalue++;

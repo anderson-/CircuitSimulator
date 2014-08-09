@@ -28,7 +28,7 @@ public class SRAMElm extends ChipElm {
     }
     short data[] = new short[256];//Fuck this lack of unsigned types. That's twice as much data as I'd need in C
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 4;
         sizeY = 9;
         pins = new Pin[19];
@@ -69,7 +69,7 @@ public class SRAMElm extends ChipElm {
         return 8;
     }
 
-    void execute() {
+    public void execute() {
         short index = 0;
         if (pins[8].value || pins[9].value) {
             if (pins[0].value) {

@@ -7,12 +7,15 @@ class CircuitCanvas extends Canvas {
     CircuitCanvas(CircuitSimulator p) {
 	pg = p;
     }
+    @Override
     public Dimension getPreferredSize() {
 	return new Dimension(300,400);
     }
-    public void update(Graphics g) {
+    @Override
+    public synchronized void update(Graphics g) {
 	pg.updateCircuit(g);
     }
+    @Override
     public void paint(Graphics g) {
 	pg.updateCircuit(g);
     }

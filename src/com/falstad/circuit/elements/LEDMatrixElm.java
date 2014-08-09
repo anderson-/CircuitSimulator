@@ -33,7 +33,7 @@ public class LEDMatrixElm extends ChipElm {
         return "LED Matrix";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 8;
         sizeY = 8;
         pins = new Pin[16];

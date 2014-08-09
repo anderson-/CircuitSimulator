@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 	}
 	public String getChipName() { return "7-segment driver/display"; }
 	Color darkred;
-	void setupPins() {
+	public void setupPins() {
 	    darkred = new Color(30, 0, 0);
 	    sizeX = 4;
 	    sizeY = 4;

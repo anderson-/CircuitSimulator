@@ -26,7 +26,7 @@ public class JKFlipFlopElm extends ChipElm {
         return "JK flip-flop";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 3;
         pins = new Pin[getPostCount()];
@@ -54,7 +54,7 @@ public class JKFlipFlopElm extends ChipElm {
         return 2;
     }
 
-    void execute() {
+    public void execute() {
         if (!pins[1].value && lastClock) {
             boolean q = pins[3].value;
             if (pins[0].value) {

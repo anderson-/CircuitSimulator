@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
 	}
 	public String getChipName() { return "Seven Segment LED Decoder"; }
 
-	void setupPins() {
+	public void setupPins() {
 	    sizeX = 3;
 	    sizeY = 7;
 	    pins = new Pin[getPostCount()];
@@ -63,7 +63,7 @@ import java.util.StringTokenizer;
 	}
 	public int getVoltageSourceCount() {return 7;}
 
-	void execute() {
+	public void execute() {
 	int input=0;
 	if(pins[7].value)input+=8;
 	if(pins[8].value)input+=4;

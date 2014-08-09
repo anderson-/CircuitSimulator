@@ -31,7 +31,7 @@ public class CC2Elm extends ChipElm {
         return "CC2";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 3;
         pins = new Pin[3];

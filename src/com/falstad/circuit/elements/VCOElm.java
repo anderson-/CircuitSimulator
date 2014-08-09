@@ -18,7 +18,7 @@ public class VCOElm extends ChipElm {
         return "VCO";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 4;
         pins = new Pin[6];

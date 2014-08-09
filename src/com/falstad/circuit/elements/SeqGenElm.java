@@ -34,7 +34,7 @@ public class SeqGenElm extends ChipElm {
         return "Sequence generator";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 2;
         pins = new Pin[getPostCount()];
@@ -62,7 +62,7 @@ public class SeqGenElm extends ChipElm {
         position++;
     }
 
-    void execute() {
+    public void execute() {
         if (oneshot) {
             if (sim.getT() - lastchangetime > 0.005) {
                 if (position <= 8) {

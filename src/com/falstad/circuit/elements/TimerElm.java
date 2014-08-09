@@ -31,7 +31,7 @@ public class TimerElm extends ChipElm {
         return "555 Timer";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 3;
         sizeY = 5;
         pins = new Pin[7];

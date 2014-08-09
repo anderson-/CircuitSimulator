@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 	}
 	public String getChipName() { return "Full Adder"; }
 
-	void setupPins() {
+	public void setupPins() {
 	    sizeX=2;
 	    sizeY=3;
 	    pins=new Pin[getPostCount()];
@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
 	}
 	public int getVoltageSourceCount() {return 2;}
 
-	void execute() {
+	public void execute() {
 	pins[0].value=(pins[2].value^pins[3].value)^pins[4].value;
 	pins[1].value=(pins[2].value&&pins[3].value)||(pins[2].value&&pins[4].value)||
                       (pins[3].value&&pins[4].value);

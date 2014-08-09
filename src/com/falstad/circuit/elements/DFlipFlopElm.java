@@ -31,7 +31,7 @@ public class DFlipFlopElm extends ChipElm {
         return "D flip-flop";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 3;
         pins = new Pin[getPostCount()];
@@ -67,7 +67,7 @@ public class DFlipFlopElm extends ChipElm {
         pins[2].value = true;
     }
 
-    void execute() {
+    public void execute() {
         if (pins[3].value && !lastClock) {
             pins[1].value = pins[0].value;
             pins[2].value = !pins[0].value;

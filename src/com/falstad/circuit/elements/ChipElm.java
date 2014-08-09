@@ -5,13 +5,24 @@ import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
 
-abstract class ChipElm extends CircuitElm {
+public abstract class ChipElm extends CircuitElm {
+
+    public static final int SIDE_N = 0;
+    public static final int SIDE_S = 1;
+    public static final int SIDE_W = 2;
+    public static final int SIDE_E = 3;
 
     int csize, cspc, cspc2;
     int bits;
     final int FLAG_SMALL = 1;
     final int FLAG_FLIP_X = 1024;
     final int FLAG_FLIP_Y = 2048;
+
+    int rectPointsX[], rectPointsY[];
+    int clockPointsX[], clockPointsY[];
+    protected Pin pins[];
+    protected int sizeX, sizeY;
+    boolean lastClock;
 
     public ChipElm(int xx, int yy) {
         super(xx, yy);
@@ -53,7 +64,7 @@ abstract class ChipElm extends CircuitElm {
         flags |= (s == 1) ? FLAG_SMALL : 0;
     }
 
-    abstract void setupPins();
+    public abstract void setupPins();
 
     public void draw(Graphics g) {
         drawChip(g);
@@ -97,11 +108,6 @@ abstract class ChipElm extends CircuitElm {
             drawPost(g, pins[i].post.x, pins[i].post.y, nodes[i]);
         }
     }
-    int rectPointsX[], rectPointsY[];
-    int clockPointsX[], clockPointsY[];
-    Pin pins[];
-    int sizeX, sizeY;
-    boolean lastClock;
 
     public void drag(int xx, int yy) {
         yy = sim.snapGrid(yy);
@@ -177,7 +183,7 @@ abstract class ChipElm extends CircuitElm {
         }
     }
 
-    void execute() {
+    public void execute() {
     }
 
     public void doStep() {
@@ -301,14 +307,9 @@ abstract class ChipElm extends CircuitElm {
         }
     }
 
-    final int SIDE_N = 0;
-    final int SIDE_S = 1;
-    final int SIDE_W = 2;
-    final int SIDE_E = 3;
+    public class Pin {
 
-    class Pin {
-
-        Pin(int p, int s, String t) {
+        public Pin(int p, int s, String t) {
             pos = p;
             side = s;
             text = t;
@@ -317,10 +318,10 @@ abstract class ChipElm extends CircuitElm {
         Point textloc;
         int pos, side, voltSource, bubbleX, bubbleY;
         String text;
-        boolean lineOver, bubble, clock, output, value, state;
+        public boolean lineOver, bubble, clock, output, value, state;
         double curcount, current;
 
-        void setPoint(int px, int py, int dx, int dy, int dax, int day,
+        public void setPoint(int px, int py, int dx, int dy, int dax, int day,
                 int sx, int sy) {
             if ((flags & FLAG_FLIP_X) != 0) {
                 dx = -dx;

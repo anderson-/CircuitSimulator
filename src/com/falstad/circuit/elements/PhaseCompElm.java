@@ -18,7 +18,7 @@ public class PhaseCompElm extends ChipElm {
         return "phase comparator";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 2;
         pins = new Pin[3];

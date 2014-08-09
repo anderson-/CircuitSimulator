@@ -13,6 +13,8 @@ import com.falstad.circuit.elements.SwitchElm;
 import com.falstad.circuit.elements.VoltageElm;
 import com.falstad.circuit.elements.WireElm;
 import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilterInputStream;
@@ -28,6 +30,7 @@ import javax.swing.JPanel;
 public class CircuitSimulator extends JPanel {
 
     /* static */
+    public static final String PROPERTY_CIRCUIT_CHANGE = "undo";
     public static final int sourceRadius = 7;
     public static final double freqMult = 3.14159265 * 2 * 4;
     static final double pi = 3.14159265358979323846;
@@ -70,7 +73,7 @@ public class CircuitSimulator extends JPanel {
     int hintType = -1, hintItem1, hintItem2;
     String stopMessage;
     double timeStep;
-    Vector<CircuitElm> elmList;
+    private Vector<CircuitElm> elmList;
 //    Vector setupList;
     CircuitElm dragElm, menuElm, mouseElm, stopElm;
     boolean didSwitch = false;
@@ -85,6 +88,8 @@ public class CircuitSimulator extends JPanel {
     int voltageSourceCount;
     int circuitMatrixSize, circuitMatrixFullSize;
     boolean circuitNeedsMap;
+    double voltageRange = 5;
+    double currentMult, powerMult;
 //    public boolean useFrame;
     int scopeCount;
     Scope scopes[];
@@ -117,15 +122,17 @@ public class CircuitSimulator extends JPanel {
     Vector<CircuitNode> nodeList;
     CircuitElm voltageSources[];
     CircuitController gui;
+    protected final PropertyChangeSupport support;
 
     boolean shown = false;
 
     public CircuitSimulator() {
         gui = new CircuitController(this);
+        support = new PropertyChangeSupport(this);
 
         dumpTypes = new Class[300];
         shortcuts = new Class[127];
-        
+
         // these characters are reserved
         dumpTypes[(int) 'o'] = Scope.class;
         dumpTypes[(int) 'h'] = Scope.class;
@@ -156,8 +163,6 @@ public class CircuitSimulator extends JPanel {
         String useFrameStr = null;
         boolean printable = false;
         boolean convention = true;
-
-        CircuitElm.initClass(this);
 
 //        try {
 //            baseURL = applet.getDocumentBase().getFile();
@@ -301,10 +306,10 @@ public class CircuitSimulator extends JPanel {
         shown = true;
     }
 
-    public void register(Class c){
+    public void register(Class c) {
         register(c, constructElement(c, 0, 0));
     }
-    
+
     public void register(Class c, CircuitElm elm) {
         int t = elm.getDumpType();
         if (t == 0) {
@@ -324,7 +329,7 @@ public class CircuitSimulator extends JPanel {
         }
 
         Class dclass = elm.getDumpClass();
-
+        
         if (dumpTypes[t] != null && dumpTypes[t] != dclass) {
             System.out.println("dump type conflict: " + c + " "
                     + dumpTypes[t]);
@@ -398,9 +403,9 @@ public class CircuitSimulator extends JPanel {
                 int inc = (int) (sysTime - lastTime);
                 double c = currentBarValue;
                 c = java.lang.Math.exp(c / 3.5 - 14.2);
-                CircuitElm.currentMult = 1.7 * inc * c;
+                currentMult = 1.7 * inc * c;
                 if (!conventionCheckItemState) {
-                    CircuitElm.currentMult = -CircuitElm.currentMult;
+                    currentMult = -currentMult;
                 }
             }
             if (sysTime - secTime >= 1000) {
@@ -414,7 +419,7 @@ public class CircuitSimulator extends JPanel {
         } else {
             lastTime = 0;
         }
-        CircuitElm.powerMult = Math.exp(powerBarValue / 4.762 - 7);
+        powerMult = Math.exp(powerBarValue / 4.762 - 7);
 
         int i;
         Font oldfont = g.getFont();
@@ -552,7 +557,9 @@ public class CircuitSimulator extends JPanel {
          g.drawString("iterc: " + (getIterCount()),  10, 70);
          */
 
-        realg.drawImage(dbimage, 0, 0, /*this*/ null);
+        if (realg != null) {
+            realg.drawImage(dbimage, 0, 0, /*this*/ null);
+        }
         if (!stopped && circuitMatrix != null) {
             // Limit to 50 fps (thanks to Jurgen Klotzer for this)
             long delay = 1000 / 50 - (System.currentTimeMillis() - lastFrameTime);
@@ -725,7 +732,7 @@ public class CircuitSimulator extends JPanel {
         }
     }
 
-    void needAnalyze() {
+    public void needAnalyze() {
         analyzeFlag = true;
         cv.repaint();
     }
@@ -744,7 +751,7 @@ public class CircuitSimulator extends JPanel {
         return elmList.elementAt(n);
     }
 
-    void analyzeCircuit() {
+    public void analyzeCircuit() {
         calcCircuitBottom();
         if (elmList.isEmpty()) {
             return;
@@ -1191,6 +1198,7 @@ public class CircuitSimulator extends JPanel {
                 return;
             }
         }
+        support.firePropertyChange(PROPERTY_CIRCUIT_CHANGE, "", dumpCircuit());
     }
 
     void calcCircuitBottom() {
@@ -1283,6 +1291,42 @@ public class CircuitSimulator extends JPanel {
 
     public boolean euroResistor() {
         return euroResistor;
+    }
+
+    void setStopped(boolean stopped) {
+        this.stopped = stopped;
+    }
+
+    public double getVoltageRange() {
+        return voltageRange;
+    }
+
+    public void setVoltageRange(double voltageRange) {
+        this.voltageRange = voltageRange;
+    }
+
+    public double getPowerMult() {
+        return powerMult;
+    }
+
+    public double getCurrentMult() {
+        return currentMult;
+    }
+
+    public void addCircuitChangeListener(PropertyChangeListener l) {
+        support.addPropertyChangeListener(l);
+    }
+
+    public void removeCircuitChangeListener(PropertyChangeListener l) {
+        support.removePropertyChangeListener(l);
+    }
+
+    public void addElement(CircuitElm dragElm) {
+        elmList.add(dragElm);
+    }
+
+    public void setHeldSwitchElm(SwitchElm se) {
+        heldSwitchElm = se;
     }
 
     public class FindPathInfo {
@@ -1776,7 +1820,7 @@ public class CircuitSimulator extends JPanel {
         expDialog.execute();
     }
 
-    String dumpCircuit() {
+    public String dumpCircuit() {
         int i;
         int f = (showCurrent) ? 1 : 0;
         f |= (smallGrid) ? 2 : 0;
@@ -1786,7 +1830,7 @@ public class CircuitSimulator extends JPanel {
         // 32 = linear scale in afilter
         String dump = "$ " + f + " "
                 + timeStep + " " + getIterCount() + " "
-                + currentBarValue + " " + CircuitElm.voltageRange + " "
+                + currentBarValue + " " + voltageRange + " "
                 + powerBarValue + "\n";
         for (i = 0; i != elmList.size(); i++) {
             dump += getElm(i).dump() + "\n";
@@ -1927,7 +1971,7 @@ public class CircuitSimulator extends JPanel {
         this.title = title;
     }
 
-    void readSetup(byte b[], int len, boolean retain) {
+    void readSetup(byte[] b, int len, boolean retain) {
         int i;
         if (!retain) {
             for (i = 0; i != elmList.size(); i++) {
@@ -1946,7 +1990,7 @@ public class CircuitSimulator extends JPanel {
             speedBarValue = 117; // 57
             currentBarValue = 50;
             powerBarValue = 50;
-            CircuitElm.voltageRange = 5;
+            voltageRange = 5;
             scopeCount = 0;
         }
         cv.repaint();
@@ -2020,6 +2064,7 @@ public class CircuitSimulator extends JPanel {
                     oarr[3] = new Integer(y2);
                     oarr[4] = new Integer(f);
                     oarr[5] = st;
+                    CircuitElm.currentSim = this;
                     ce = (CircuitElm) cstr.newInstance(oarr);
                     ce.setPoints();
                     elmList.addElement(ce);
@@ -2042,6 +2087,56 @@ public class CircuitSimulator extends JPanel {
         needAnalyze();
     }
 
+    public static CircuitElm createElm(String line, CircuitSimulator cs) {
+        StringTokenizer st = new StringTokenizer(line);
+        while (st.hasMoreTokens()) {
+            String type = st.nextToken();
+            int tint = type.charAt(0);
+            try {
+                int x1 = new Integer(st.nextToken()).intValue();
+                int y1 = new Integer(st.nextToken()).intValue();
+                int x2 = new Integer(st.nextToken()).intValue();
+                int y2 = new Integer(st.nextToken()).intValue();
+                int f = new Integer(st.nextToken()).intValue();
+                CircuitElm ce = null;
+                Class cls = cs.dumpTypes[tint];
+                if (cls == null) {
+                    System.out.println("unrecognized dump type: " + type);
+                    break;
+                }
+                // find element class
+                Class carr[] = new Class[6];
+                //carr[0] = getClass();
+                carr[0] = carr[1] = carr[2] = carr[3] = carr[4]
+                        = int.class;
+                carr[5] = StringTokenizer.class;
+                Constructor cstr = null;
+                cstr = cls.getConstructor(carr);
+
+                // invoke constructor with starting coordinates
+                Object oarr[] = new Object[6];
+                //oarr[0] = this;
+                oarr[0] = new Integer(x1);
+                oarr[1] = new Integer(y1);
+                oarr[2] = new Integer(x2);
+                oarr[3] = new Integer(y2);
+                oarr[4] = new Integer(f);
+                oarr[5] = st;
+                CircuitElm.currentSim = cs;
+                ce = (CircuitElm) cstr.newInstance(oarr);
+                ce.setPoints();
+                return ce;
+            } catch (java.lang.reflect.InvocationTargetException ee) {
+                ee.getTargetException().printStackTrace();
+                break;
+            } catch (Exception ee) {
+                ee.printStackTrace();
+                break;
+            }
+        }
+        return null;
+    }
+
     void readHint(StringTokenizer st) {
         hintType = new Integer(st.nextToken()).intValue();
         hintItem1 = new Integer(st.nextToken()).intValue();
@@ -2060,10 +2155,10 @@ public class CircuitSimulator extends JPanel {
         int sp2 = (int) (Math.log(10 * sp) * 24 + 61.5);
         //int sp2 = (int) (Math.log(sp)*24+1.5);
         speedBarValue = (sp2);
-        currentBarValue = (new Integer(st.nextToken()).intValue());
-        CircuitElm.voltageRange = new Double(st.nextToken()).doubleValue();
+        currentBarValue = (new Double(st.nextToken()).doubleValue());
+        voltageRange = new Double(st.nextToken()).doubleValue();
         try {
-            powerBarValue = (new Integer(st.nextToken()).intValue());
+            powerBarValue = (new Double(st.nextToken()).doubleValue());
         } catch (Exception e) {
         }
         setGrid();
@@ -2280,7 +2375,9 @@ public class CircuitSimulator extends JPanel {
         oarr[0] = new Integer(x0);
         oarr[1] = new Integer(y0);
         try {
-            return (CircuitElm) cstr.newInstance(oarr);
+            CircuitElm.currentSim = this;
+            CircuitElm elm = (CircuitElm) cstr.newInstance(oarr);
+            return elm;
         } catch (Exception ee) {
             ee.printStackTrace();
         }
@@ -2307,9 +2404,10 @@ public class CircuitSimulator extends JPanel {
     void pushUndo() {
         redoStack.removeAllElements();
         String s = dumpCircuit();
-        if (undoStack.size() > 0
-                && s.compareTo(undoStack.lastElement()) == 0) {
-            return;
+        if (undoStack.size() > 0) {
+            if (s.equals(undoStack.lastElement())) {
+                return;
+            }
         }
         undoStack.add(s);
         enableUndoRedo();
@@ -2536,7 +2634,7 @@ public class CircuitSimulator extends JPanel {
     // gaussian elimination.  On entry, a[0..n-1][0..n-1] is the
     // matrix to be factored.  ipvt[] returns an integer vector of pivot
     // indices, used in the lu_solve() routine.
-    boolean lu_factor(double a[][], int n, int ipvt[]) {
+    private boolean lu_factor(double a[][], int n, int ipvt[]) {
         double scaleFactors[];
         int i, j, k;
 
@@ -2620,7 +2718,7 @@ public class CircuitSimulator extends JPanel {
     // Solves the set of n linear equations using a LU factorization
     // previously performed by lu_factor.  On input, b[0..n-1] is the right
     // hand side of the equations, and on output, contains the solution.
-    void lu_solve(double a[][], int n, int ipvt[], double b[]) {
+    private void lu_solve(double a[][], int n, int ipvt[], double b[]) {
         int i;
 
         // find first nonzero b element

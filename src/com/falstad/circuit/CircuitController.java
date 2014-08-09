@@ -5,6 +5,7 @@
  */
 package com.falstad.circuit;
 
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Label;
@@ -150,13 +151,14 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
     public void actionPerformed(ActionEvent e) {
         String ac = e.getActionCommand();
         if (e.getSource() == resetButton) {
+            sim.setStopped(!sim.isStopped());
             int i;
 
             // on IE, drawImage() stops working inexplicably every once in
             // a while.  Recreating it fixes the problem, so we do that here.
             sim.dbimage = sim.getContainer().createImage(sim.winSize.width, sim.winSize.height);
 
-            for (i = 0; i != sim.elmList.size(); i++) {
+            for (i = 0; i != sim.elmListSize(); i++) {
                 sim.getElm(i).reset();
             }
             for (i = 0; i != sim.scopeCount; i++) {
@@ -353,7 +355,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         sim.plotXElm = sim.plotYElm = null;
         int bestDist = 100000;
         int bestArea = 100000;
-        for (i = 0; i != sim.elmList.size(); i++) {
+        for (i = 0; i != sim.elmListSize(); i++) {
             CircuitElm ce = sim.getElm(i);
             if (ce.boundingBox.contains(x, y)) {
                 int j;
@@ -392,7 +394,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             }
             // the mouse pointer was not in any of the bounding boxes, but we
             // might still be close to a post
-            for (i = 0; i != sim.elmList.size(); i++) {
+            for (i = 0; i != sim.elmListSize(); i++) {
                 CircuitElm ce = sim.getElm(i);
                 int j;
                 int jn = ce.getPostCount();
@@ -569,7 +571,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             if (sim.dragElm.x == sim.dragElm.x2 && sim.dragElm.y == sim.dragElm.y2) {
                 sim.dragElm.delete();
             } else {
-                sim.elmList.addElement(sim.dragElm);
+                sim.addElement(sim.dragElm);
                 circuitChanged = true;
             }
             sim.dragElm = null;
@@ -711,13 +713,6 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
 //        conventionCheckItem.setState(convention); //TODO
         m.add(optionsItem = getMenuItem("Other Options..."));
 
-        JMenu circuitsMenu = new JMenu("Circuits");
-        if (useFrame) {
-            mb.add(circuitsMenu);
-        } else {
-            mainMenu.add(circuitsMenu);
-        }
-
         mainMenu.add(getClassCheckItem("Add Wire", "WireElm"));
         mainMenu.add(getClassCheckItem("Add Resistor", "ResistorElm"));
 
@@ -850,38 +845,55 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         mainMenu.add(getCheckItem("Select/Drag Selected (space or Shift-drag)", "Select"));
         sim.getContainer().add(mainMenu);
 
-        sim.getContainer().add(resetButton = new JButton("Reset"));
+        createSideBar(mb, useFrame, sim.getContainer());
+
+//        if (useFrame) {
+//            setMenuBar(mb);
+//        }
+        return mb;
+    }
+
+    public void createSideBar(JMenuBar mb, boolean useFrame, Container c) {
+
+        JMenu circuitsMenu = new JMenu("Circuits");
+        if (useFrame) {
+            mb.add(circuitsMenu);
+        } else {
+            mainMenu.add(circuitsMenu);
+        }
+
+        c.add(resetButton = new JButton("Reset"));
         resetButton.addActionListener(this);
         dumpMatrixButton = new JButton("Dump Matrix");
-        //sim.getContainer().add(dumpMatrixButton);
+        //c.add(dumpMatrixButton);
         dumpMatrixButton.addActionListener(this);
         stoppedCheck = new JCheckBox("Stopped");
         stoppedCheck.addItemListener(this);
-        sim.getContainer().add(stoppedCheck);
+        c.add(stoppedCheck);
 
-        sim.getContainer().add(new Label("Simulation Speed", JLabel.CENTER));
+        c.add(new Label("Simulation Speed", JLabel.CENTER));
 
         // was max of 140
-        sim.getContainer().add(speedBar = new JScrollBar(JScrollBar.HORIZONTAL, 3, 1, 0, 260));
+        c.add(speedBar = new JScrollBar(JScrollBar.HORIZONTAL, 3, 1, 0, 260));
         speedBar.addAdjustmentListener(this);
 
-        sim.getContainer().add(new Label("Current Speed", JLabel.CENTER));
+        c.add(new Label("Current Speed", JLabel.CENTER));
         currentBar = new JScrollBar(JScrollBar.HORIZONTAL,
                 50, 1, 1, 100);
         currentBar.addAdjustmentListener(this);
-        sim.getContainer().add(currentBar);
+        c.add(currentBar);
 
-        sim.getContainer().add(powerLabel = new JLabel("Power Brightness", JLabel.CENTER));
-        sim.getContainer().add(powerBar = new JScrollBar(JScrollBar.HORIZONTAL,
+        c.add(powerLabel = new JLabel("Power Brightness", JLabel.CENTER));
+        c.add(powerBar = new JScrollBar(JScrollBar.HORIZONTAL,
                 50, 1, 1, 100));
         powerBar.addAdjustmentListener(this);
         powerBar.disable();
         powerLabel.disable();
 
-        sim.getContainer().add(new Label("www.falstad.com"));
+        c.add(new Label("www.falstad.com"));
 
         if (useFrame) {
-            sim.getContainer().add(new Label(""));
+            c.add(new Label(""));
         }
         Font f = new Font("SansSerif", 0, 10);
         Label l;
@@ -890,8 +902,8 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         titleLabel = new JLabel("Label");
         titleLabel.setFont(f);
         if (useFrame) {
-            sim.getContainer().add(l);
-            sim.getContainer().add(titleLabel);
+            c.add(l);
+            c.add(titleLabel);
         }
 
         elmMenu = new JPopupMenu();
@@ -900,16 +912,12 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         elmMenu.add(elmCutMenuItem = getMenuItem("Cut"));
         elmMenu.add(elmCopyMenuItem = getMenuItem("Copy"));
         elmMenu.add(elmDeleteMenuItem = getMenuItem("Delete"));
-        sim.getContainer().add(elmMenu);
+        c.add(elmMenu);
 
         Scope.scopeMenu = Scope.buildScopeMenu(false, sim);
         Scope.transScopeMenu = Scope.buildScopeMenu(true, sim);
 
         sim.getSetupList(circuitsMenu, false);
-//        if (useFrame) {
-//            setMenuBar(mb);
-//        }
-        return mb;
     }
 
     public void keyPressed(KeyEvent e) {

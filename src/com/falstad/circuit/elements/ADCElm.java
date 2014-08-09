@@ -24,7 +24,7 @@ public class ADCElm extends ChipElm {
     }
 
     @Override
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = bits > 2 ? bits : 2;
         pins = new Pin[getPostCount()];
@@ -39,7 +39,7 @@ public class ADCElm extends ChipElm {
     }
 
     @Override
-    void execute() {
+    public void execute() {
         int imax = (1 << bits) - 1;
         // if we round, the half-flash doesn't work
         double val = imax * volts[bits] / volts[bits + 1]; // + .5;

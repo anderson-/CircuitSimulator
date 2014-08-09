@@ -37,11 +37,11 @@ public class AndGateElm extends GateElm {
         gatePoly = createPolygon(triPoints);
     }
 
-    String getGateName() {
+    public String getGateName() {
         return "AND gate";
     }
 
-    boolean calcFunction() {
+    public boolean calcFunction() {
         int i;
         boolean f = true;
         for (i = 0; i != inputCount; i++) {

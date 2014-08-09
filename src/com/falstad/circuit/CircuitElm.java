@@ -10,45 +10,21 @@ import java.text.NumberFormat;
 
 public abstract class CircuitElm implements Editable {
 
-    protected static double voltageRange = 5;
-    protected static int colorScaleCount = 32;
-    protected static Color colorScale[];
-    protected static double currentMult, powerMult;
-    protected static Point ps1, ps2;
-    protected static CircuitSimulator sim;
+    private static final int colorScaleCount = 32;
+    private static final Color colorScale[] = new Color[colorScaleCount];
     public static Color whiteColor, selectColor, lightGrayColor;
-    protected static Font unitsFont;
+    protected static final Font unitsFont;
 
-    public static NumberFormat showFormat, shortFormat, noCommaFormat;
+    protected Point ps1 = new Point();
+    protected Point ps2 = new Point();
+
+    public static CircuitSimulator currentSim;
+    protected CircuitSimulator sim = currentSim;
+
+    public static final NumberFormat showFormat, shortFormat, noCommaFormat;
     public static final double pi = 3.14159265358979323846;
 
-    protected int x, y, x2, y2, flags, nodes[], voltSource;
-    protected int dx, dy, dsign;
-    protected double dn, dpx1, dpy1;
-    protected Point point1, point2, lead1, lead2;
-    protected double volts[];
-    protected double current, curcount;
-    protected Rectangle boundingBox;
-    protected boolean noDiagonal;
-    public boolean selected;
-
-    public int getDumpType() {
-        return 0;
-    }
-
-    public Class getDumpClass() {
-        return getClass();
-    }
-
-    public int getDefaultFlags() {
-        return 0;
-    }
-
-    public static void initClass(CircuitSimulator s) {
-        unitsFont = new Font("SansSerif", 0, 10);
-        sim = s;
-
-        colorScale = new Color[colorScaleCount];
+    static {
         int i;
         for (i = 0; i != colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;
@@ -63,8 +39,7 @@ public abstract class CircuitElm implements Editable {
             }
         }
 
-        ps1 = new Point();
-        ps2 = new Point();
+        unitsFont = new Font("SansSerif", 0, 10);
 
         showFormat = DecimalFormat.getInstance();
         showFormat.setMaximumFractionDigits(2);
@@ -73,6 +48,33 @@ public abstract class CircuitElm implements Editable {
         noCommaFormat = DecimalFormat.getInstance();
         noCommaFormat.setMaximumFractionDigits(10);
         noCommaFormat.setGroupingUsed(false);
+
+    }
+
+    protected int x, y, x2, y2, flags, nodes[], voltSource;
+    protected int dx, dy, dsign;
+    protected double dn, dpx1, dpy1;
+    protected Point point1, point2, lead1, lead2;
+    protected double volts[];
+    protected double current, curcount;
+    protected Rectangle boundingBox;
+    protected boolean noDiagonal;
+    public boolean selected;
+
+    public CircuitSimulator getCS(){
+        return sim;
+    }
+    
+    public int getDumpType() {
+        return 0;
+    }
+
+    public Class getDumpClass() {
+        return getClass();
+    }
+
+    public int getDefaultFlags() {
+        return 0;
     }
 
     public CircuitElm(int xx, int yy) {
@@ -127,6 +129,10 @@ public abstract class CircuitElm implements Editable {
 
     public double getCurrent() {
         return current;
+    }
+    
+    public double getWhut() {
+        return curcount;
     }
 
     public void doStep() {
@@ -324,7 +330,7 @@ public abstract class CircuitElm implements Editable {
         int nx2 = x2 + dx;
         int ny2 = y2 + dy;
         int i;
-        for (i = 0; i != sim.elmList.size(); i++) {
+        for (i = 0; i != sim.elmListSize(); i++) {
             CircuitElm ce = sim.getElm(i);
             if (ce.x == nx && ce.y == ny && ce.x2 == nx2 && ce.y2 == ny2) {
                 return false;
@@ -648,7 +654,7 @@ public abstract class CircuitElm implements Editable {
         if (sim.isStopped()) {
             return cc;
         }
-        double cadd = cur * currentMult;
+        double cadd = cur * sim.getCurrentMult();
         /*if (cur != 0 && cadd <= .05 && cadd >= -.05)
          cadd = (cadd < 0) ? -.05 : .05;*/
         cadd %= 8;
@@ -693,8 +699,8 @@ public abstract class CircuitElm implements Editable {
             }
             return;
         }
-        int c = (int) ((volts + voltageRange) * (colorScaleCount - 1)
-                / (voltageRange * 2));
+        int c = (int) ((volts + sim.getVoltageRange()) * (colorScaleCount - 1)
+                / (sim.getVoltageRange() * 2));
         if (c < 0) {
             c = 0;
         }
@@ -716,7 +722,7 @@ public abstract class CircuitElm implements Editable {
     }
 
     public void setPowerColor(Graphics g, double w0) {
-        w0 *= powerMult;
+        w0 *= sim.getPowerMult();
         //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {
@@ -735,7 +741,7 @@ public abstract class CircuitElm implements Editable {
     }
 
     public void setConductanceColor(Graphics g, double w0) {
-        w0 *= powerMult;
+        w0 *= sim.getPowerMult();
         //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {

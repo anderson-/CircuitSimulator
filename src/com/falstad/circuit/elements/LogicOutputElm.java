@@ -56,6 +56,10 @@ public class LogicOutputElm extends CircuitElm {
         super.setPoints();
         lead1 = interpPoint(point1, point2, 1 - 12 / dn);
     }
+    
+    public String getValue(){
+        return value;
+    }
 
     public void draw(Graphics g) {
         Font f = new Font("SansSerif", Font.BOLD, 20);

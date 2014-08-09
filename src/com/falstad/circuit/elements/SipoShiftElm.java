@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 	boolean clockstate=false;
 	public String getChipName() { return "SIPO shift register"; }
 
-	void setupPins() {
+	public void setupPins() {
 	    sizeX = 9;
 	    sizeY = 3;
 	    pins = new Pin[getPostCount()];
@@ -48,7 +48,7 @@ import java.util.StringTokenizer;
 	}
 	public int getVoltageSourceCount() {return 8;}
 
-	void execute() {
+	public void execute() {
 
 		if(pins[1].value&&!clockstate)
 		{

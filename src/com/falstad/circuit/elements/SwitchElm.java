@@ -40,10 +40,10 @@ public class SwitchElm extends CircuitElm {
         posCount = 2;
     }
 
-    public boolean isMomentary(){
+    public boolean isMomentary() {
         return momentary;
     }
-    
+
     public int getDumpType() {
         return 's';
     }
@@ -110,6 +110,15 @@ public class SwitchElm extends CircuitElm {
         if (position >= posCount) {
             position = 0;
         }
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int i) {
+        position = i;
+        getCS().needAnalyze();
     }
 
     public void getInfo(String arr[]) {

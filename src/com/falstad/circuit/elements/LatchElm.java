@@ -23,7 +23,7 @@ public class LatchElm extends ChipElm {
     }
     int loadPin;
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = bits + 1;
         pins = new Pin[getPostCount()];
@@ -40,7 +40,7 @@ public class LatchElm extends ChipElm {
     }
     boolean lastLoad = false;
 
-    void execute() {
+    public void execute() {
         int i;
         if (pins[loadPin].value && !lastLoad) {
             for (i = 0; i != bits; i++) {

@@ -8,8 +8,13 @@ import java.util.StringTokenizer;
 abstract public class GateElm extends CircuitElm {
 
     final int FLAG_SMALL = 1;
-    int inputCount = 2;
-    boolean lastOutput;
+    protected int inputCount = 2;
+    protected boolean lastOutput;
+    int gsize, gwidth, gwidth2, gheight, hs2;
+    Point inPosts[], inGates[];
+    int ww;
+    Polygon gatePoly;
+    Point pcircle, linePoints[];
 
     public GateElm(int xx, int yy) {
         super(xx, yy);
@@ -30,7 +35,6 @@ abstract public class GateElm extends CircuitElm {
     boolean isInverting() {
         return false;
     }
-    int gsize, gwidth, gwidth2, gheight, hs2;
 
     void setSize(int s) {
         gsize = s;
@@ -43,8 +47,6 @@ abstract public class GateElm extends CircuitElm {
     public String dump() {
         return super.dump() + " " + inputCount + " " + volts[inputCount];
     }
-    Point inPosts[], inGates[];
-    int ww;
 
     public void setPoints() {
         super.setPoints();
@@ -99,8 +101,6 @@ abstract public class GateElm extends CircuitElm {
         drawDots(g, lead2, point2, curcount);
         drawPosts(g);
     }
-    Polygon gatePoly;
-    Point pcircle, linePoints[];
 
     public int getPostCount() {
         return inputCount + 1;
@@ -117,7 +117,7 @@ abstract public class GateElm extends CircuitElm {
         return 1;
     }
 
-    abstract String getGateName();
+    public abstract String getGateName();
 
     public void getInfo(String arr[]) {
         arr[0] = getGateName();
@@ -129,11 +129,11 @@ abstract public class GateElm extends CircuitElm {
         sim.stampVoltageSource(0, nodes[inputCount], voltSource);
     }
 
-    boolean getInput(int x) {
+    public boolean getInput(int x) {
         return volts[x] > 2.5;
     }
 
-    abstract boolean calcFunction();
+    public abstract boolean calcFunction();
 
     public void doStep() {
         int i;
@@ -158,7 +158,7 @@ abstract public class GateElm extends CircuitElm {
         inputCount = (int) ei.value;
         setPoints();
     }
-	// there is no current path through the gate inputs, but there
+    // there is no current path through the gate inputs, but there
     // is an indirect path through the output to ground.
 
     public boolean getConnection(int n1, int n2) {

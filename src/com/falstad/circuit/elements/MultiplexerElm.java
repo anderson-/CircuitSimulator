@@ -14,7 +14,7 @@ import java.util.StringTokenizer;
 	}
 	public String getChipName() { return "Multiplexer"; }
 
-	void setupPins() {
+	public void setupPins() {
 	    sizeX = 3;
 	    sizeY = 5;
 	    pins = new Pin[getPostCount()];
@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
 	}
 	public int getVoltageSourceCount() {return 1;}
 
-	void execute() {
+	public void execute() {
 	 int selectedvalue=0;
 	 if(pins[4].value)selectedvalue++;
 	 if(pins[5].value)selectedvalue+=2;

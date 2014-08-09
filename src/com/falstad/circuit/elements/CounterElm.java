@@ -36,7 +36,7 @@ public class CounterElm extends ChipElm {
         return "Counter";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = bits > 2 ? bits : 2;
         pins = new Pin[getPostCount()];
@@ -119,7 +119,7 @@ public class CounterElm extends ChipElm {
         return bits;
     }
 
-    void execute() {
+    public void execute() {
         boolean en = true;
         if (hasEnable()) {
             en = pins[bits + 2].value;

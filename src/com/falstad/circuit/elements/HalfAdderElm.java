@@ -22,7 +22,7 @@ public class HalfAdderElm extends ChipElm {
         return "Half Adder";
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = 2;
         sizeY = 2;
         pins = new Pin[getPostCount()];
@@ -44,7 +44,7 @@ public class HalfAdderElm extends ChipElm {
         return 2;
     }
 
-    void execute() {
+    public void execute() {
 
         pins[0].value = pins[2].value ^ pins[3].value;
         pins[1].value = pins[2].value && pins[3].value;

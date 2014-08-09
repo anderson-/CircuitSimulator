@@ -22,7 +22,7 @@ public class DecadeElm extends ChipElm {
         return true;
     }
 
-    void setupPins() {
+    public void setupPins() {
         sizeX = bits > 2 ? bits : 2;
         sizeY = 2;
         pins = new Pin[getPostCount()];
@@ -47,7 +47,7 @@ public class DecadeElm extends ChipElm {
         return bits;
     }
 
-    void execute() {
+    public void execute() {
         int i;
         if (pins[0].value && !lastClock) {
             for (i = 0; i != bits; i++) {
