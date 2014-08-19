@@ -334,8 +334,8 @@ public class Scope {
         double realMaxI = -1e8;
         double realMinV = 1e8;
         double realMinI = 1e8;
-        int curColor = 0xFFFFFF00;
-        int voltColor = (value > 0) ? 0xFFFFFFFF : 0xFF00FF00;
+        int curColor = sim.whiteBackground() ? Color.magenta.getRGB() : Color.yellow.getRGB();
+        int voltColor = (value > 0) ? 0xFFFFFFFF : (sim.whiteBackground() ? Color.blue.getRGB() : Color.green.getRGB());
         if (sim.scopeSelected == -1 && elm == sim.mouseElm) {
             curColor = voltColor = 0xFF00FFFF;
         }

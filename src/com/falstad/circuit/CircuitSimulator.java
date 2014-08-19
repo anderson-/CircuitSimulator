@@ -13,6 +13,7 @@ import com.falstad.circuit.elements.SwitchElm;
 import com.falstad.circuit.elements.VoltageElm;
 import com.falstad.circuit.elements.WireElm;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayOutputStream;
@@ -95,16 +96,16 @@ public class CircuitSimulator extends JPanel {
     Scope scopes[];
     int scopeColCount[];
     Class dumpTypes[], shortcuts[];
-    String clipboard;
+    private static String clipboard = "";
     Rectangle circuitArea;
     int circuitBottom;
     Vector<String> undoStack, redoStack;
     EditDialog editDialog;
     ImportExportDialog impDialog, expDialog;
     private boolean whiteBackground;//printable
-    private boolean stopped;//stoppedCheckItemState
+    private boolean stopped = true;//stoppedCheckItemState
     private double currentBarValue;
-    private boolean conventionCheckItemState;
+    private boolean conventionCheckItemState = true;
     private boolean showPowerDissipation;//powerCheckItemState
     private double powerBarValue;
     private int speedBarValue;
@@ -118,15 +119,20 @@ public class CircuitSimulator extends JPanel {
     String startLabel = null;
     public String startCircuitText = null;
     String baseURL = "http://www.falstad.com/circuit/";
-    CircuitCanvas cv;
+    public CircuitCanvas cv;
     Vector<CircuitNode> nodeList;
     CircuitElm voltageSources[];
     CircuitController gui;
     protected final PropertyChangeSupport support;
 
     boolean shown = false;
+    private static boolean pasteEnabled = false;
 
     public CircuitSimulator() {
+        this(true);
+    }
+
+    public CircuitSimulator(boolean canvas) {
         gui = new CircuitController(this);
         support = new PropertyChangeSupport(this);
 
@@ -140,6 +146,7 @@ public class CircuitSimulator extends JPanel {
         dumpTypes[(int) '%'] = Scope.class;
         dumpTypes[(int) '?'] = Scope.class;
         dumpTypes[(int) 'B'] = Scope.class;
+        cv = new CircuitCanvas(this, canvas);
     }
 
     public int getrand(int x) {
@@ -224,12 +231,8 @@ public class CircuitSimulator extends JPanel {
         }
 
         main.setLayout(new CircuitLayout());
-        cv = new CircuitCanvas(this);
-        cv.addComponentListener(gui);
-        cv.addMouseMotionListener(gui);
-        cv.addMouseListener(gui);
-        cv.addKeyListener(gui);
-        main.add(cv);
+        cv.addListeners(gui);
+        main.add(cv.getCanvas());
 
         setGrid();
         elmList = new Vector<CircuitElm>();
@@ -245,6 +248,7 @@ public class CircuitSimulator extends JPanel {
         cv.setBackground(Color.black);
         cv.setForeground(Color.lightGray);
 
+        cv.init();
     }
 
     public void posInit() {
@@ -329,7 +333,7 @@ public class CircuitSimulator extends JPanel {
         }
 
         Class dclass = elm.getDumpClass();
-        
+
         if (dumpTypes[t] != null && dumpTypes[t] != dclass) {
             System.out.println("dump type conflict: " + c + " "
                     + dumpTypes[t]);
@@ -357,7 +361,7 @@ public class CircuitSimulator extends JPanel {
 
     public void updateCircuit(Graphics realg) {
         CircuitElm realMouseElm;
-        if (winSize == null || winSize.width == 0) {
+        if (winSize == null || winSize.width == 0 || dbimage == null) {
             return;
         }
         if (analyzeFlag) {
@@ -378,13 +382,25 @@ public class CircuitSimulator extends JPanel {
                 RenderingHints.VALUE_ANTIALIAS_ON);
         CircuitElm.selectColor = Color.cyan;
         if (whiteBackground) {
-            CircuitElm.whiteColor = Color.black;
-            CircuitElm.lightGrayColor = Color.black;
-            g.setColor(Color.white);
+            if (stopped) {
+                CircuitElm.whiteColor = Color.white;
+                CircuitElm.lightGrayColor = Color.lightGray;
+                g.setColor(Color.decode("#133a5f"));
+            } else {
+                CircuitElm.whiteColor = Color.black;
+                CircuitElm.lightGrayColor = Color.black;
+                g.setColor(Color.white);
+            }
         } else {
-            CircuitElm.whiteColor = Color.white;
-            CircuitElm.lightGrayColor = Color.lightGray;
-            g.setColor(Color.black);
+            if (stopped) {
+                CircuitElm.whiteColor = Color.white;
+                CircuitElm.lightGrayColor = Color.lightGray;
+                g.setColor(Color.decode("#133a5f"));
+            } else {
+                CircuitElm.whiteColor = Color.white;
+                CircuitElm.lightGrayColor = Color.lightGray;
+                g.setColor(Color.black);
+            }
         }
         g.fillRect(0, 0, winSize.width, winSize.height);
         if (!stopped) {
@@ -393,7 +409,7 @@ public class CircuitSimulator extends JPanel {
             } catch (Exception e) {
                 e.printStackTrace();
                 analyzeFlag = true;
-                cv.repaint();
+                cv.repaintCanvas();
                 return;
             }
         }
@@ -480,8 +496,10 @@ public class CircuitSimulator extends JPanel {
         if (stopMessage != null) {
             ct = 0;
         }
-        for (i = 0; i != ct; i++) {
-            scopes[i].draw(g);
+        if (!stopped) {
+            for (i = 0; i != ct; i++) {
+                scopes[i].draw(g);
+            }
         }
         g.setColor(CircuitElm.whiteColor);
         if (stopMessage != null) {
@@ -507,7 +525,9 @@ public class CircuitSimulator extends JPanel {
 
             } else {
                 CircuitElm.showFormat.setMinimumFractionDigits(2);
-                info[0] = "t = " + CircuitElm.getUnitText(t, "s");
+                if (!stopped) {
+                    info[0] = "t = " + CircuitElm.getUnitText(t, "s");
+                }
                 CircuitElm.showFormat.setMinimumFractionDigits(0);
             }
             if (hintType != -1) {
@@ -571,7 +591,7 @@ public class CircuitSimulator extends JPanel {
                 }
             }
 
-            cv.repaint(0);
+            cv.repaintCanvas(0);
         }
         lastFrameTime = lastTime;
     }
@@ -725,7 +745,7 @@ public class CircuitSimulator extends JPanel {
                 if (n == 0) {
                     ((SwitchElm) ce).toggle();
                     analyzeFlag = true;
-                    cv.repaint();
+                    cv.repaintCanvas();
                     return;
                 }
             }
@@ -734,7 +754,7 @@ public class CircuitSimulator extends JPanel {
 
     public void needAnalyze() {
         analyzeFlag = true;
-        cv.repaint();
+        cv.repaintCanvas();
     }
 
     public CircuitNode getCircuitNode(int n) {
@@ -1257,8 +1277,12 @@ public class CircuitSimulator extends JPanel {
         return useBufferedImage;
     }
 
-    public Canvas getCircuitCanvas() {
+    public CircuitCanvas getCircuitCanvas() {
         return cv;
+    }
+
+    public void isStopped(boolean stopped) {
+        this.stopped = stopped;
     }
 
     public boolean isStopped() {
@@ -1293,7 +1317,7 @@ public class CircuitSimulator extends JPanel {
         return euroResistor;
     }
 
-    void setStopped(boolean stopped) {
+    public void setStopped(boolean stopped) {
         this.stopped = stopped;
     }
 
@@ -1452,7 +1476,7 @@ public class CircuitSimulator extends JPanel {
         stopElm = ce;
         stopped = true;
         analyzeFlag = false;
-        cv.repaint();
+        cv.repaintCanvas();
     }
 
     // control voltage source vs with voltage from n1 to n2 (must
@@ -1730,7 +1754,7 @@ public class CircuitSimulator extends JPanel {
 
     public void editFuncPoint(int x, int y) {
         // XXX
-        cv.repaint(pause);
+        cv.repaintCanvas(pause);
     }
 
     void stackScope(int s) {
@@ -1993,7 +2017,7 @@ public class CircuitSimulator extends JPanel {
             voltageRange = 5;
             scopeCount = 0;
         }
-        cv.repaint();
+        cv.repaintCanvas();
         int p;
         for (p = 0; p < len;) {
             int l;
@@ -2441,9 +2465,9 @@ public class CircuitSimulator extends JPanel {
     void setMouseMode(int mode) {
         mouseMode = mode;
         if (mode == CircuitController.MODE_ADD_ELM) {
-            cv.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+            cv.setCanvasCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
         } else {
-            cv.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            cv.setCanvasCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
@@ -2509,6 +2533,7 @@ public class CircuitSimulator extends JPanel {
 
     void doCopy() {
         int i;
+        System.out.println("copy");
         clipboard = "";
         setMenuSelection();
         for (i = elmList.size() - 1; i >= 0; i--) {
@@ -2521,56 +2546,58 @@ public class CircuitSimulator extends JPanel {
     }
 
     void enablePaste() {
-//        pasteItem.setEnabled(clipboard.length() > 0); //TODO
+        pasteEnabled = true;
     }
 
     void doPaste() {
-        pushUndo();
-        clearSelection();
-        int i;
-        Rectangle oldbb = null;
-        for (i = 0; i != elmList.size(); i++) {
-            CircuitElm ce = getElm(i);
-            Rectangle bb = ce.getBoundingBox();
-            if (oldbb != null) {
-                oldbb = oldbb.union(bb);
-            } else {
-                oldbb = bb;
+        if (pasteEnabled) {
+            pushUndo();
+            clearSelection();
+            int i;
+            Rectangle oldbb = null;
+            for (i = 0; i != elmList.size(); i++) {
+                CircuitElm ce = getElm(i);
+                Rectangle bb = ce.getBoundingBox();
+                if (oldbb != null) {
+                    oldbb = oldbb.union(bb);
+                } else {
+                    oldbb = bb;
+                }
             }
-        }
-        int oldsz = elmList.size();
-        readSetup(clipboard, true);
+            int oldsz = elmList.size();
+            readSetup(clipboard, true);
 
-        // select new items
-        Rectangle newbb = null;
-        for (i = oldsz; i != elmList.size(); i++) {
-            CircuitElm ce = getElm(i);
-            ce.setSelected(true);
-            Rectangle bb = ce.getBoundingBox();
-            if (newbb != null) {
-                newbb = newbb.union(bb);
-            } else {
-                newbb = bb;
-            }
-        }
-        if (oldbb != null && newbb != null && oldbb.intersects(newbb)) {
-            // find a place for new items
-            int dx = 0, dy = 0;
-            int spacew = circuitArea.width - oldbb.width - newbb.width;
-            int spaceh = circuitArea.height - oldbb.height - newbb.height;
-            if (spacew > spaceh) {
-                dx = snapGrid(oldbb.x + oldbb.width - newbb.x + gridSize);
-            } else {
-                dy = snapGrid(oldbb.y + oldbb.height - newbb.y + gridSize);
-            }
+            // select new items
+            Rectangle newbb = null;
             for (i = oldsz; i != elmList.size(); i++) {
                 CircuitElm ce = getElm(i);
-                ce.move(dx, dy);
+                ce.setSelected(true);
+                Rectangle bb = ce.getBoundingBox();
+                if (newbb != null) {
+                    newbb = newbb.union(bb);
+                } else {
+                    newbb = bb;
+                }
             }
-            // center circuit
-            handleResize();
+            if (oldbb != null && newbb != null && oldbb.intersects(newbb)) {
+                // find a place for new items
+                int dx = 0, dy = 0;
+                int spacew = circuitArea.width - oldbb.width - newbb.width;
+                int spaceh = circuitArea.height - oldbb.height - newbb.height;
+                if (spacew > spaceh) {
+                    dx = snapGrid(oldbb.x + oldbb.width - newbb.x + gridSize);
+                } else {
+                    dy = snapGrid(oldbb.y + oldbb.height - newbb.y + gridSize);
+                }
+                for (i = oldsz; i != elmList.size(); i++) {
+                    CircuitElm ce = getElm(i);
+                    ce.move(dx, dy);
+                }
+                // center circuit
+                handleResize();
+            }
+            needAnalyze();
         }
-        needAnalyze();
     }
 
     void clearSelection() {
@@ -2589,12 +2616,12 @@ public class CircuitSimulator extends JPanel {
         }
     }
 
-    void handleResize() {
-        winSize = cv.getSize();
+    public void handleResize() {
+        winSize = cv.getCanvasSize();
         if (winSize.width == 0) {
             return;
         }
-        dbimage = main.createImage(winSize.width, winSize.height);
+        dbimage = new BufferedImage(winSize.width, winSize.height, BufferedImage.TYPE_4BYTE_ABGR);
         int h = winSize.height / 5;
         /*if (h < 128 && winSize.height > 300)
          h = 128;*/

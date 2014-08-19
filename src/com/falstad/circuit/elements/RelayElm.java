@@ -116,7 +116,7 @@ public class RelayElm extends CircuitElm {
 
             interpPoint(swpoles[p][1], swpoles[p][2], ptSwitch[p], d_position);
             //setVoltageColor(g, volts[nSwitch0]);
-            g.setColor(Color.lightGray);
+            g.setColor(whiteColor);
             drawThickLine(g, swpoles[p][0], ptSwitch[p]);
             switchCurCount[p] = updateDotCount(switchCurrent[p],
                     switchCurCount[p]);

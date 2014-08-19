@@ -29,13 +29,15 @@ public abstract class CircuitElm implements Editable {
         for (i = 0; i != colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;
             if (v < 0) {
-                int n1 = (int) (128 * -v) + 127;
-                int n2 = (int) (127 * (1 + v));
-                colorScale[i] = new Color(n1, n2, n2);
+                int n1 = (int) (128 * -v) + 100;
+                int n2 = (int) (100 * (1 + v));
+                int n3 = (int) (100 * (1 + v));
+                colorScale[i] = new Color(n1, n2, n3);
             } else {
-                int n1 = (int) (128 * v) + 127;
-                int n2 = (int) (127 * (1 - v));
-                colorScale[i] = new Color(n2, n1, n2);
+                int n1 = (int) (128 * v) + 100;
+                int n2 = (int) (100 * (1 - v));
+                int n3 = (int) (100 * (1 - v));
+                colorScale[i] = new Color(n2, n1, n3);
             }
         }
 
@@ -61,10 +63,10 @@ public abstract class CircuitElm implements Editable {
     protected boolean noDiagonal;
     public boolean selected;
 
-    public CircuitSimulator getCS(){
+    public CircuitSimulator getCS() {
         return sim;
     }
-    
+
     public int getDumpType() {
         return 0;
     }
@@ -130,7 +132,7 @@ public abstract class CircuitElm implements Editable {
     public double getCurrent() {
         return current;
     }
-    
+
     public double getWhut() {
         return curcount;
     }
@@ -245,7 +247,6 @@ public abstract class CircuitElm implements Editable {
         int dx = pb.x - pa.x;
         int dy = pb.y - pa.y;
         double dn = Math.sqrt(dx * dx + dy * dy);
-        g.setColor(Color.yellow);
         int ds = 16;
         pos %= ds;
         if (pos < 0) {
@@ -255,7 +256,8 @@ public abstract class CircuitElm implements Editable {
         for (di = pos; di < dn; di += ds) {
             int x0 = (int) (pa.x + di * dx / dn);
             int y0 = (int) (pa.y + di * dy / dn);
-            g.fillRect(x0 - 1, y0 - 1, 4, 4);
+            g.setColor(Color.yellow);
+            g.fillOval(x0 - 1, y0 - 1, 4, 4);
         }
     }
 
@@ -707,7 +709,12 @@ public abstract class CircuitElm implements Editable {
         if (c >= colorScaleCount) {
             c = colorScaleCount - 1;
         }
-        g.setColor(colorScale[c]);
+        if (sim.isStopped()) {
+            g.setColor(Color.decode("#3E80BD"));//blue
+            g.setColor(Color.white);//blue
+        } else {
+            g.setColor(colorScale[c]);
+        }
     }
 
     public void setPowerColor(Graphics g, boolean yellow) {

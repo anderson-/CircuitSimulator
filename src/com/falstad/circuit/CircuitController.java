@@ -129,7 +129,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
     }
 
     public void paint(Graphics g) {
-        sim.cv.repaint();
+        sim.cv.repaintCanvas();
     }
 
     public void componentHidden(ComponentEvent e) {
@@ -139,12 +139,12 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
     }
 
     public void componentShown(ComponentEvent e) {
-        sim.cv.repaint();
+        sim.cv.repaintCanvas();
     }
 
     public void componentResized(ComponentEvent e) {
         sim.handleResize();
-        sim.cv.repaint(100);
+        sim.cv.repaintCanvas(100);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             sim.analyzeFlag = true;
             sim.t = 0;
             stoppedCheck.setSelected(false);
-            sim.cv.repaint();
+            sim.cv.repaintCanvas();
         }
         if (e.getSource() == dumpMatrixButton) {
             sim.dumpMatrix = true;
@@ -269,7 +269,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             if (ac.compareTo("reset") == 0) {
                 sim.scopes[sim.menuScope].resetGraph();
             }
-            sim.cv.repaint();
+            sim.cv.repaintCanvas();
         }
         if (ac.indexOf("setup ") == 0) {
             sim.pushUndo();
@@ -336,7 +336,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
                 sim.dragY = sim.snapGrid(e.getY());
             }
         }
-        sim.cv.repaint(sim.pause);
+        sim.cv.repaintCanvas(sim.pause);
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -419,7 +419,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             }
         }
         if (sim.mouseElm != origMouse) {
-            sim.cv.repaint();
+            sim.cv.repaintCanvas();
         }
     }
 
@@ -440,7 +440,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
     public void mouseExited(MouseEvent e) {
         sim.scopeSelected = -1;
         sim.mouseElm = sim.plotXElm = sim.plotYElm = null;
-        sim.cv.repaint();
+        sim.cv.repaintCanvas();
     }
 
     public void mousePressed(MouseEvent e) {
@@ -583,11 +583,11 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
             sim.dragElm.delete();
         }
         sim.dragElm = null;
-        sim.cv.repaint();
+        sim.cv.repaintCanvas();
     }
 
     public void itemStateChanged(ItemEvent e) {
-        sim.cv.repaint(sim.pause);
+        sim.cv.repaintCanvas(sim.pause);
         Object mi = e.getItemSelectable();
         if (mi == stoppedCheck) {
             return;
@@ -644,6 +644,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
     }
 
     public JMenuBar createGUI(boolean useFrame) {
+        useFrame = true;//tmp
         mainMenu = new JPopupMenu();
         JMenuBar mb = null;
         if (useFrame) {
@@ -672,7 +673,7 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         copyItem.setAccelerator(KeyStroke.getKeyStroke('C', KeyEvent.CTRL_DOWN_MASK));
         m.add(pasteItem = getMenuItem("Paste"));
         pasteItem.setAccelerator(KeyStroke.getKeyStroke('V', KeyEvent.CTRL_DOWN_MASK));
-        pasteItem.setEnabled(false);
+//        pasteItem.setEnabled(false);
         m.add(selectAllItem = getMenuItem("Select All"));
         selectAllItem.setAccelerator(KeyStroke.getKeyStroke('A', KeyEvent.CTRL_DOWN_MASK));
         if (useFrame) {
