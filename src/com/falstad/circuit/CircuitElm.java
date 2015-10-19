@@ -408,7 +408,7 @@ public abstract class CircuitElm implements Editable {
 
     public void drawPost(Graphics g, int x0, int y0, int n) {
         if (sim.getDragElm() == null && !needsHighlight()
-                && sim.getCircuitNode(n).links.size() == 2) {
+                && sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
             return;
         }
         if (sim.mouseMode == CircuitController.MODE_DRAG_ROW

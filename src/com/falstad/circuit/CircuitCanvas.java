@@ -53,15 +53,19 @@ class CircuitCanvas {
             final BufferedImage bi = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
             cs.handleResize();
             cs.needAnalyze();
+            cs.updateCircuit(bi.getGraphics());
+//            cs.analyzeCircuit();
             new Thread() {
                 @Override
                 public void run() {
                     while (true) {
                         try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException ex) {
+                            Thread.sleep(sleep);
+                            cs.updateCircuit(bi.getGraphics());
+                        } catch (Exception ex) {
+                            System.out.println(this);
+                            ex.printStackTrace();
                         }
-                        cs.updateCircuit(bi.getGraphics());
                     }
                 }
             }.start();

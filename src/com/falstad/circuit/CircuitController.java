@@ -833,11 +833,11 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         otherMenu.add(getCheckItem("Drag All (Alt-drag)", "DragAll"));
         otherMenu.add(getCheckItem(
                 sim.isMac ? "Drag Row (Alt-S-drag, S-right)"
-                : "Drag Row (S-right)",
+                        : "Drag Row (S-right)",
                 "DragRow"));
         otherMenu.add(getCheckItem(
                 sim.isMac ? "Drag Column (Alt-\u2318-drag, \u2318-right)"
-                : "Drag Column (C-right)",
+                        : "Drag Column (C-right)",
                 "DragColumn"));
         otherMenu.add(getCheckItem("Drag Selected", "DragSelected"));
         otherMenu.add(getCheckItem("Drag Post (" + sim.ctrlMetaKey + "-drag)",

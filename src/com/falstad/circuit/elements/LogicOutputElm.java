@@ -60,7 +60,7 @@ public class LogicOutputElm extends CircuitElm {
     public String getValue(){
         return value;
     }
-
+    
     public void draw(Graphics g) {
         Font f = new Font("SansSerif", Font.BOLD, 20);
         g.setFont(f);

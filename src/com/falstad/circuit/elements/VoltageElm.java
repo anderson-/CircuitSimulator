@@ -7,17 +7,18 @@ import java.util.StringTokenizer;
 
 public class VoltageElm extends CircuitElm {
 
-    static final int FLAG_COS = 2;
-    int waveform;
-    static final int WF_DC = 0;
-    static final int WF_AC = 1;
-    static final int WF_SQUARE = 2;
-    static final int WF_TRIANGLE = 3;
-    static final int WF_SAWTOOTH = 4;
-    static final int WF_PULSE = 5;
-    static final int WF_VAR = 6;
-    double frequency, maxVoltage, freqTimeZero, bias,
+    public static final int FLAG_COS = 2;
+    public static final int WF_DC = 0;
+    public static final int WF_AC = 1;
+    public static final int WF_SQUARE = 2;
+    public static final int WF_TRIANGLE = 3;
+    public static final int WF_SAWTOOTH = 4;
+    public static final int WF_PULSE = 5;
+    public static final int WF_VAR = 6;
+    protected int waveform;
+    protected double frequency, maxVoltage, freqTimeZero, bias,
             phaseShift, dutyCycle;
+    protected final int circleSize = 17;
 
     public VoltageElm(int xx, int yy, int wf) {
         super(xx, yy);
@@ -113,7 +114,6 @@ public class VoltageElm extends CircuitElm {
                 return 0;
         }
     }
-    final int circleSize = 17;
 
     public void setPoints() {
         super.setPoints();

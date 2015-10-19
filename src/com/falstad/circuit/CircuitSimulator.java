@@ -127,6 +127,7 @@ public class CircuitSimulator extends JPanel {
 
     boolean shown = false;
     private static boolean pasteEnabled = false;
+    private boolean unstable = false;
 
     public CircuitSimulator() {
         this(true);
@@ -496,11 +497,11 @@ public class CircuitSimulator extends JPanel {
         if (stopMessage != null) {
             ct = 0;
         }
-        if (!stopped) {
+//        if (!stopped) {
             for (i = 0; i != ct; i++) {
                 scopes[i].draw(g);
             }
-        }
+//        }
         g.setColor(CircuitElm.whiteColor);
         if (stopMessage != null) {
             g.drawString(stopMessage, 10, circuitArea.height);
@@ -753,12 +754,13 @@ public class CircuitSimulator extends JPanel {
     }
 
     public void needAnalyze() {
+        unstable = true;
         analyzeFlag = true;
         cv.repaintCanvas();
     }
 
     public CircuitNode getCircuitNode(int n) {
-        if (n >= nodeList.size()) {
+        if (nodeList == null || n >= nodeList.size()) {
             return null;
         }
         return nodeList.elementAt(n);
@@ -1234,10 +1236,16 @@ public class CircuitSimulator extends JPanel {
     }
 
     public int elmListSize() {
+        if (elmList == null) {
+            return 0;
+        }
         return elmList.size();
     }
 
     public int nodeListSize() {
+        if (nodeList == null) {
+            return 0;
+        }
         return nodeList.size();
     }
 
@@ -1251,6 +1259,14 @@ public class CircuitSimulator extends JPanel {
 
     public void setConverged(boolean converged) {
         this.converged = converged;
+    }
+    
+    public boolean isUnstable(){
+        return unstable;
+    }
+
+    public boolean isConverged(){
+        return converged;
     }
 
     void setTimeStep(double timeStep) {
@@ -1267,6 +1283,10 @@ public class CircuitSimulator extends JPanel {
 
     public void setAnalyzeFlag(boolean analyzeFlag) {
         this.analyzeFlag = analyzeFlag;
+    }
+    
+    public boolean getAnalyzeFlag(){
+        return analyzeFlag;
     }
 
     public int getSubIterations() {
@@ -1351,6 +1371,10 @@ public class CircuitSimulator extends JPanel {
 
     public void setHeldSwitchElm(SwitchElm se) {
         heldSwitchElm = se;
+    }
+
+    boolean isReady() {
+        return elmList != null && nodeList != null;
     }
 
     public class FindPathInfo {
@@ -1722,8 +1746,9 @@ public class CircuitSimulator extends JPanel {
                     break;
                 }
             }
-            if (subiter > 5) {
+            if (subiter > 1) {
                 System.out.print("converged after " + subiter + " iterations\n");
+                unstable = false;
             }
             if (subiter == subiterCount) {
                 stop("Convergence failed!", null);
