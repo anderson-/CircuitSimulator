@@ -316,7 +316,7 @@ public abstract class ChipElm extends CircuitElm {
         }
         Point post, stub;
         Point textloc;
-        int pos, side, voltSource, bubbleX, bubbleY;
+        public int pos, side, voltSource, bubbleX, bubbleY;
         String text;
         public boolean lineOver, bubble, clock, output, value, state;
         double curcount, current;

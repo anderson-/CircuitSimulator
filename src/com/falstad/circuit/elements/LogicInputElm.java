@@ -8,7 +8,7 @@ public class LogicInputElm extends SwitchElm {
 
     final int FLAG_TERNARY = 1;
     final int FLAG_NUMERIC = 2;
-    double hiV, loV;
+    protected double hiV, loV;
 
     public LogicInputElm(int xx, int yy) {
         super(xx, yy, false);

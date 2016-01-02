@@ -754,7 +754,7 @@ public class CircuitSimulator extends JPanel {
     }
 
     public void needAnalyze() {
-        unstable = true;
+//        unstable = true;
         analyzeFlag = true;
         cv.repaintCanvas();
     }
@@ -1260,6 +1260,10 @@ public class CircuitSimulator extends JPanel {
     public void setConverged(boolean converged) {
         this.converged = converged;
     }
+
+    public void setUnstable(boolean unstable) {
+        this.unstable = unstable;
+    }
     
     public boolean isUnstable(){
         return unstable;
@@ -1301,10 +1305,6 @@ public class CircuitSimulator extends JPanel {
         return cv;
     }
 
-    public void isStopped(boolean stopped) {
-        this.stopped = stopped;
-    }
-
     public boolean isStopped() {
         return stopped;
     }
@@ -1340,7 +1340,7 @@ public class CircuitSimulator extends JPanel {
     public void setStopped(boolean stopped) {
         this.stopped = stopped;
     }
-
+    
     public double getVoltageRange() {
         return voltageRange;
     }

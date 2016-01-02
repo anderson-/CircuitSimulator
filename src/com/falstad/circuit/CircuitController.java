@@ -147,27 +147,31 @@ public class CircuitController implements ComponentListener, ActionListener, Adj
         sim.cv.repaintCanvas(100);
     }
 
+    public static void reset(CircuitSimulator sim) {
+        sim.setStopped(!sim.isStopped());
+        int i;
+
+        // on IE, drawImage() stops working inexplicably every once in
+        // a while.  Recreating it fixes the problem, so we do that here.
+        sim.dbimage = sim.getContainer().createImage(sim.winSize.width, sim.winSize.height);
+
+        for (i = 0; i != sim.elmListSize(); i++) {
+            sim.getElm(i).reset();
+        }
+        for (i = 0; i != sim.scopeCount; i++) {
+            sim.scopes[i].resetGraph();
+        }
+        sim.analyzeFlag = true;
+        sim.t = 0;
+        sim.cv.repaintCanvas();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String ac = e.getActionCommand();
         if (e.getSource() == resetButton) {
-            sim.setStopped(!sim.isStopped());
-            int i;
-
-            // on IE, drawImage() stops working inexplicably every once in
-            // a while.  Recreating it fixes the problem, so we do that here.
-            sim.dbimage = sim.getContainer().createImage(sim.winSize.width, sim.winSize.height);
-
-            for (i = 0; i != sim.elmListSize(); i++) {
-                sim.getElm(i).reset();
-            }
-            for (i = 0; i != sim.scopeCount; i++) {
-                sim.scopes[i].resetGraph();
-            }
-            sim.analyzeFlag = true;
-            sim.t = 0;
+            reset(sim);
             stoppedCheck.setSelected(false);
-            sim.cv.repaintCanvas();
         }
         if (e.getSource() == dumpMatrixButton) {
             sim.dumpMatrix = true;

@@ -13,7 +13,7 @@ import java.awt.image.MemoryImageSource;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-class CircuitCanvas {
+public class CircuitCanvas {
 
     private static final boolean debugFrame = false;
 
@@ -55,13 +55,17 @@ class CircuitCanvas {
             cs.needAnalyze();
             cs.updateCircuit(bi.getGraphics());
 //            cs.analyzeCircuit();
-            new Thread() {
+            new Thread("HiddenCircuitSim" + Thread.activeCount() + 1) {
                 @Override
                 public void run() {
                     while (true) {
                         try {
                             Thread.sleep(sleep);
-                            cs.updateCircuit(bi.getGraphics());
+                            if (!cs.isStopped()) {
+                                cs.updateCircuit(bi.getGraphics());
+                            } else {
+                                Thread.sleep(50);
+                            }
                         } catch (Exception ex) {
                             System.out.println(this);
                             ex.printStackTrace();

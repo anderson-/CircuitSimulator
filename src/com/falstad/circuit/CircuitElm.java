@@ -582,7 +582,7 @@ public abstract class CircuitElm implements Editable {
         return getUnitText(v, "V");
     }
 
-    public static String getUnitText(double v, String u) {
+    public synchronized static String getUnitText(double v, String u) {
         double va = Math.abs(v);
         if (va < 1e-14) {
             return "0 " + u;
