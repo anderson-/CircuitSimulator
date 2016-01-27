@@ -1,5 +1,6 @@
 package com.falstad.circuit.elements;
 
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -11,7 +12,6 @@ public class LEDElm extends DiodeElm {
     public LEDElm(int xx, int yy) {
         super(xx, yy);
         fwdrop = 2.1024259;
-        setup();
         colorR = 1;
         colorG = colorB = 0;
     }
@@ -22,12 +22,11 @@ public class LEDElm extends DiodeElm {
         if ((f & FLAG_FWDROP) == 0) {
             fwdrop = 2.1024259;
         }
-        setup();
         colorR = new Double(st.nextToken()).doubleValue();
         colorG = new Double(st.nextToken()).doubleValue();
         colorB = new Double(st.nextToken()).doubleValue();
     }
-
+    
     public int getDumpType() {
         return 162;
     }

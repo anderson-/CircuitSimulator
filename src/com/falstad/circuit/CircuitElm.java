@@ -18,8 +18,11 @@ public abstract class CircuitElm implements Editable {
     protected Point ps1 = new Point();
     protected Point ps2 = new Point();
 
-    public static CircuitSimulator currentSim;
-    protected CircuitSimulator sim = currentSim;
+    protected CircuitSimulator sim = null;
+    
+    public void setSim(CircuitSimulator sim){
+        this.sim = sim;
+    }
 
     public static final NumberFormat showFormat, shortFormat, noCommaFormat;
     public static final double pi = 3.14159265358979323846;

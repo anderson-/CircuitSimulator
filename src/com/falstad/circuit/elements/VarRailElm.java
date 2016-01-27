@@ -1,5 +1,6 @@
 package com.falstad.circuit.elements;
 
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -14,7 +15,6 @@ public class VarRailElm extends RailElm {
         super(xx, yy, WF_VAR);
         sliderText = "Voltage";
         frequency = maxVoltage;
-        createSlider();
     }
 
     public VarRailElm(int xa, int ya, int xb, int yb, int f,
@@ -24,9 +24,14 @@ public class VarRailElm extends RailElm {
         while (st.hasMoreTokens()) {
             sliderText += ' ' + st.nextToken();
         }
-        createSlider();
     }
 
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        createSlider();
+    }
+    
     public String dump() {
         return super.dump() + " " + sliderText;
     }

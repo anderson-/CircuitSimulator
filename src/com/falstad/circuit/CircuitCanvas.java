@@ -25,6 +25,9 @@ public class CircuitCanvas {
     long sleep = 0;
     boolean up = true;
 
+    private Thread updateThread = null;
+    private boolean kill = false;
+
     CircuitCanvas(CircuitSimulator p, boolean runOnCanvas) {
         this.runOnCanvas = runOnCanvas;
         cs = p;
@@ -48,6 +51,12 @@ public class CircuitCanvas {
         }
     }
 
+    public void kill() {
+        if (updateThread != null && updateThread.isAlive()) {
+            kill = true;
+        }
+    }
+
     public void init() {
         if (!runOnCanvas) {
             final BufferedImage bi = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
@@ -55,11 +64,14 @@ public class CircuitCanvas {
             cs.needAnalyze();
             cs.updateCircuit(bi.getGraphics());
 //            cs.analyzeCircuit();
-            new Thread("HiddenCircuitSim" + Thread.activeCount() + 1) {
+            updateThread = new Thread("HiddenCircuitSim" + Thread.activeCount() + 1) {
                 @Override
                 public void run() {
                     while (true) {
                         try {
+                            if (kill || cs.isDisabled()) {
+                                return;
+                            }
                             Thread.sleep(sleep);
                             if (!cs.isStopped()) {
                                 cs.updateCircuit(bi.getGraphics());
@@ -72,7 +84,8 @@ public class CircuitCanvas {
                         }
                     }
                 }
-            }.start();
+            };
+            updateThread.start();
 
             if (debugFrame) {
                 JFrame f = new JFrame();

@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -18,7 +19,6 @@ public class SweepElm extends CircuitElm {
         maxV = 5;
         sweepTime = .1;
         flags = FLAG_BIDIR;
-        reset();
     }
 
     public SweepElm(int xa, int ya, int xb, int yb, int f, StringTokenizer st) {
@@ -27,9 +27,14 @@ public class SweepElm extends CircuitElm {
         maxF = new Double(st.nextToken()).doubleValue();
         maxV = new Double(st.nextToken()).doubleValue();
         sweepTime = new Double(st.nextToken()).doubleValue();
-        reset();
     }
 
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim);
+        reset();
+    }
+    
     public int getDumpType() {
         return 170;
     }

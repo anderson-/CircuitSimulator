@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -31,9 +32,14 @@ public abstract class ChipElm extends CircuitElm {
         }
         noDiagonal = true;
         setupPins();
-        setSize(sim.usingSmallGrid() ? 1 : 2);
     }
 
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        setSize(super.sim.usingSmallGrid() ? 1 : 2);
+    }
+    
     public ChipElm(int xa, int ya, int xb, int yb, int f,
             StringTokenizer st) {
         super(xa, ya, xb, yb, f);

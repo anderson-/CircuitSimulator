@@ -46,7 +46,7 @@ public class CircuitSimulator extends JPanel {
     public static String ohmString = "ohm";
 
     /* AWT - remove */
-    /* Vars */
+ /* Vars */
     Dimension winSize;
     Image dbimage;
 
@@ -128,6 +128,7 @@ public class CircuitSimulator extends JPanel {
     boolean shown = false;
     private static boolean pasteEnabled = false;
     private boolean unstable = false;
+    private boolean disabled = false;
 
     public CircuitSimulator() {
         this(true);
@@ -164,6 +165,10 @@ public class CircuitSimulator extends JPanel {
 
     public CircuitController getGUI() {
         return gui;
+    }
+
+    public void kill() {
+        cv.kill();
     }
 
     public void init() {
@@ -249,7 +254,6 @@ public class CircuitSimulator extends JPanel {
         cv.setBackground(Color.black);
         cv.setForeground(Color.lightGray);
 
-        cv.init();
     }
 
     public void posInit() {
@@ -281,7 +285,9 @@ public class CircuitSimulator extends JPanel {
 //            applet.validate();
 //        }
         requestFocus();
-
+        if (!disabled) {
+            cv.init();
+        }
     }
 
     public double getT() {
@@ -392,16 +398,14 @@ public class CircuitSimulator extends JPanel {
                 CircuitElm.lightGrayColor = Color.black;
                 g.setColor(Color.white);
             }
+        } else if (stopped) {
+            CircuitElm.whiteColor = Color.white;
+            CircuitElm.lightGrayColor = Color.lightGray;
+            g.setColor(Color.decode("#133a5f"));
         } else {
-            if (stopped) {
-                CircuitElm.whiteColor = Color.white;
-                CircuitElm.lightGrayColor = Color.lightGray;
-                g.setColor(Color.decode("#133a5f"));
-            } else {
-                CircuitElm.whiteColor = Color.white;
-                CircuitElm.lightGrayColor = Color.lightGray;
-                g.setColor(Color.black);
-            }
+            CircuitElm.whiteColor = Color.white;
+            CircuitElm.lightGrayColor = Color.lightGray;
+            g.setColor(Color.black);
         }
         g.fillRect(0, 0, winSize.width, winSize.height);
         if (!stopped) {
@@ -498,9 +502,9 @@ public class CircuitSimulator extends JPanel {
             ct = 0;
         }
 //        if (!stopped) {
-            for (i = 0; i != ct; i++) {
-                scopes[i].draw(g);
-            }
+        for (i = 0; i != ct; i++) {
+            scopes[i].draw(g);
+        }
 //        }
         g.setColor(CircuitElm.whiteColor);
         if (stopMessage != null) {
@@ -817,7 +821,7 @@ public class CircuitSimulator extends JPanel {
             cn.x = cn.y = -1;
             nodeList.addElement(cn);
         }
-	//System.out.println("ac2");
+        //System.out.println("ac2");
 
         // allocate nodes and voltage sources
         for (i = 0; i != elmList.size(); i++) {
@@ -875,7 +879,7 @@ public class CircuitSimulator extends JPanel {
         voltageSources = new CircuitElm[vscount];
         vscount = 0;
         circuitNonLinear = false;
-	//System.out.println("ac3");
+        //System.out.println("ac3");
 
         // determine if circuit is nonlinear
         for (i = 0; i != elmList.size(); i++) {
@@ -910,7 +914,7 @@ public class CircuitSimulator extends JPanel {
             CircuitElm ce = getElm(i);
             ce.stamp();
         }
-	//System.out.println("ac4");
+        //System.out.println("ac4");
 
         // determine nodes that are unconnected
         boolean closure[] = new boolean[nodeList.size()];
@@ -1008,7 +1012,7 @@ public class CircuitSimulator extends JPanel {
                 }
             }
         }
-	//System.out.println("ac6");
+        //System.out.println("ac6");
 
         // simplify the matrix; this speeds things up quite a bit
         for (i = 0; i != matrixSize; i++) {
@@ -1046,7 +1050,7 @@ public class CircuitSimulator extends JPanel {
                 break;
             }
             //System.out.println("line " + i + " " + qp + " " + qm + " " + j);
-	    /*if (qp != -1 && circuitRowInfo[qp].lsChanges) {
+            /*if (qp != -1 && circuitRowInfo[qp].lsChanges) {
              System.out.println("lschanges");
              continue;
              }
@@ -1066,7 +1070,7 @@ public class CircuitSimulator extends JPanel {
                     int k;
                     for (k = 0; elt.type == RowInfo.ROW_EQUAL && k < 100; k++) {
                         // follow the chain
-			/*System.out.println("following equal chain from " +
+                        /*System.out.println("following equal chain from " +
                          i + " " + qp + " to " + elt.nodeEq);*/
                         qp = elt.nodeEq;
                         elt = circuitRowInfo[qp];
@@ -1110,7 +1114,7 @@ public class CircuitSimulator extends JPanel {
                 }
             }
         }
-	//System.out.println("ac7");
+        //System.out.println("ac7");
 
         // find size of new matrix
         int nn = 0;
@@ -1155,7 +1159,7 @@ public class CircuitSimulator extends JPanel {
                 }
             }
         }
-	//System.out.println("ac8");
+        //System.out.println("ac8");
 
         /*System.out.println("matrixSize = " + matrixSize);
 	
@@ -1264,12 +1268,12 @@ public class CircuitSimulator extends JPanel {
     public void setUnstable(boolean unstable) {
         this.unstable = unstable;
     }
-    
-    public boolean isUnstable(){
+
+    public boolean isUnstable() {
         return unstable;
     }
 
-    public boolean isConverged(){
+    public boolean isConverged() {
         return converged;
     }
 
@@ -1288,8 +1292,8 @@ public class CircuitSimulator extends JPanel {
     public void setAnalyzeFlag(boolean analyzeFlag) {
         this.analyzeFlag = analyzeFlag;
     }
-    
-    public boolean getAnalyzeFlag(){
+
+    public boolean getAnalyzeFlag() {
         return analyzeFlag;
     }
 
@@ -1340,7 +1344,7 @@ public class CircuitSimulator extends JPanel {
     public void setStopped(boolean stopped) {
         this.stopped = stopped;
     }
-    
+
     public double getVoltageRange() {
         return voltageRange;
     }
@@ -1375,6 +1379,14 @@ public class CircuitSimulator extends JPanel {
 
     boolean isReady() {
         return elmList != null && nodeList != null;
+    }
+
+    public boolean setDisabled() {
+        return disabled = true;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
     }
 
     public class FindPathInfo {
@@ -1496,7 +1508,7 @@ public class CircuitSimulator extends JPanel {
 
     public void stop(String s, CircuitElm ce) {
         stopMessage = s;
-        circuitMatrix = null;
+//        circuitMatrix = null;
         stopElm = ce;
         stopped = true;
         analyzeFlag = false;
@@ -2113,8 +2125,8 @@ public class CircuitSimulator extends JPanel {
                     oarr[3] = new Integer(y2);
                     oarr[4] = new Integer(f);
                     oarr[5] = st;
-                    CircuitElm.currentSim = this;
                     ce = (CircuitElm) cstr.newInstance(oarr);
+                    ce.setSim(this);
                     ce.setPoints();
                     elmList.addElement(ce);
                 } catch (java.lang.reflect.InvocationTargetException ee) {
@@ -2171,8 +2183,8 @@ public class CircuitSimulator extends JPanel {
                 oarr[3] = new Integer(y2);
                 oarr[4] = new Integer(f);
                 oarr[5] = st;
-                CircuitElm.currentSim = cs;
                 ce = (CircuitElm) cstr.newInstance(oarr);
+                ce.setSim(cs);
                 ce.setPoints();
                 return ce;
             } catch (java.lang.reflect.InvocationTargetException ee) {
@@ -2424,8 +2436,8 @@ public class CircuitSimulator extends JPanel {
         oarr[0] = new Integer(x0);
         oarr[1] = new Integer(y0);
         try {
-            CircuitElm.currentSim = this;
             CircuitElm elm = (CircuitElm) cstr.newInstance(oarr);
+            elm.setSim(this);
             return elm;
         } catch (Exception ee) {
             ee.printStackTrace();

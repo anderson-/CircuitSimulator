@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -20,7 +21,6 @@ abstract public class GateElm extends CircuitElm {
         super(xx, yy);
         noDiagonal = true;
         inputCount = 2;
-        setSize(sim.usingSmallGrid() ? 1 : 2);
     }
 
     public GateElm(int xa, int ya, int xb, int yb, int f,
@@ -30,6 +30,14 @@ abstract public class GateElm extends CircuitElm {
         lastOutput = new Double(st.nextToken()).doubleValue() > 2.5;
         noDiagonal = true;
         setSize((f & FLAG_SMALL) != 0 ? 1 : 2);
+    }
+
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        if (gsize == 0) {
+            setSize(sim.usingSmallGrid() ? 1 : 2);
+        }
     }
 
     boolean isInverting() {

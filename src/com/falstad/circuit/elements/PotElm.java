@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +22,6 @@ public class PotElm extends CircuitElm implements AdjustmentListener {
         maxResistance = 1000;
         position = .5;
         sliderText = "Resistance";
-        createSlider();
     }
 
     public PotElm(int xa, int ya, int xb, int yb, int f,
@@ -33,7 +33,6 @@ public class PotElm extends CircuitElm implements AdjustmentListener {
         while (st.hasMoreTokens()) {
             sliderText += ' ' + st.nextToken();
         }
-        createSlider();
     }
 
     void setup() {
@@ -56,7 +55,9 @@ public class PotElm extends CircuitElm implements AdjustmentListener {
                 + position + " " + sliderText;
     }
 
-    void createSlider() {
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        this.sim = sim;
         sim.getContainer().add(label = new Label(sliderText, Label.CENTER));
         int value = (int) (position * 100);
         sim.getContainer().add(slider = new Scrollbar(Scrollbar.HORIZONTAL, value, 1, 0, 101));

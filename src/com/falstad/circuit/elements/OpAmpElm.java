@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -20,8 +21,13 @@ public class OpAmpElm extends CircuitElm {
         maxOut = 15;
         minOut = -15;
         gbw = 1e6;
-        setSize(sim.usingSmallGrid() ? 1 : 2);
         setGain();
+    }
+
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        setSize(sim.usingSmallGrid() ? 1 : 2);
     }
 
     public OpAmpElm(int xa, int ya, int xb, int yb, int f,
@@ -169,7 +175,7 @@ public class OpAmpElm extends CircuitElm {
         } else {
             dx = gain;
         }
-	    //System.out.println("opamp " + vd + " " + volts[2] + " " + dx + " "  + x + " " + lastvd + " " + sim.converged);
+        //System.out.println("opamp " + vd + " " + volts[2] + " " + dx + " "  + x + " " + lastvd + " " + sim.converged);
 
         // newton-raphson
         sim.stampMatrix(vn, nodes[0], dx);

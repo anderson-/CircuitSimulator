@@ -11,14 +11,12 @@ public class ZenerElm extends DiodeElm {
     public ZenerElm(int xx, int yy) {
         super(xx, yy);
         zvoltage = default_zvoltage;
-        setup();
     }
 
     public ZenerElm(int xa, int ya, int xb, int yb, int f,
             StringTokenizer st) {
         super(xa, ya, xb, yb, f, st);
         zvoltage = new Double(st.nextToken()).doubleValue();
-        setup();
     }
 
     void setup() {

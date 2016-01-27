@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -13,10 +14,8 @@ public class TransLineElm extends CircuitElm {
 
     public TransLineElm(int xx, int yy) {
         super(xx, yy);
-        delay = 1000 * sim.getTimeStep();
         imped = 75;
         noDiagonal = true;
-        reset();
     }
 
     public TransLineElm(int xa, int ya, int xb, int yb, int f,
@@ -28,6 +27,14 @@ public class TransLineElm extends CircuitElm {
         // next slot is for resistance (losses), which is not implemented
         st.nextToken();
         noDiagonal = true;
+    }
+
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        if (delay == 0) {
+            delay = 1000 * sim.getTimeStep();
+        }
         reset();
     }
 
@@ -175,8 +182,8 @@ public class TransLineElm extends CircuitElm {
         }
         voltageL[ptr] = volts[2] - volts[0] + volts[2] - volts[4];
         voltageR[ptr] = volts[3] - volts[1] + volts[3] - volts[5];
-	//System.out.println(volts[2] + " " + volts[0] + " " + (volts[2]-volts[0]) + " " + (imped*current1) + " " + voltageL[ptr]);
-	/*System.out.println("sending fwd  " + currentL[ptr] + " " + current1);
+        //System.out.println(volts[2] + " " + volts[0] + " " + (volts[2]-volts[0]) + " " + (imped*current1) + " " + voltageL[ptr]);
+        /*System.out.println("sending fwd  " + currentL[ptr] + " " + current1);
          System.out.println("sending back " + currentR[ptr] + " " + current2);*/
         //System.out.println("sending back " + voltageR[ptr]);
         ptr = (ptr + 1) % lenSteps;

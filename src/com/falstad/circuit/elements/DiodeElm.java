@@ -1,6 +1,7 @@
 package com.falstad.circuit.elements;
 
 import com.falstad.circuit.CircuitElm;
+import com.falstad.circuit.CircuitSimulator;
 import com.falstad.circuit.EditInfo;
 import java.awt.*;
 import java.util.StringTokenizer;
@@ -14,16 +15,13 @@ public class DiodeElm extends CircuitElm {
 
     public DiodeElm(int xx, int yy) {
         super(xx, yy);
-        diode = new Diode(sim);
         fwdrop = defaultdrop;
         zvoltage = 0;
-        setup();
     }
 
     public DiodeElm(int xa, int ya, int xb, int yb, int f,
             StringTokenizer st) {
         super(xa, ya, xb, yb, f);
-        diode = new Diode(sim);
         fwdrop = defaultdrop;
         zvoltage = 0;
         if ((f & FLAG_FWDROP) > 0) {
@@ -32,6 +30,12 @@ public class DiodeElm extends CircuitElm {
             } catch (Exception e) {
             }
         }
+    }
+
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim); //To change body of generated methods, choose Tools | Templates.
+        diode = new Diode(sim);
         setup();
     }
 
